@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot Trading Multi-Crypto Pro - PancakeSwap</title>
+    <title>Bot Trading Pro 24/7 - Ultimate Edition RÉEL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -19,1073 +19,410 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(34, 197, 94, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.8); }
+        }
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+        .keep-awake-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+        }
     </style>
 </head>
 <body class="text-white p-4 md:p-6">
+    <!-- Keep Awake Indicator -->
+    <div id="keepAwakeIndicator" class="keep-awake-indicator hidden">
+        ⚡ Mode 24/7 ACTIF
+    </div>
+
     <div class="max-w-7xl mx-auto">
+        <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
                 <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                    Bot Trading Multi-Crypto Pro
+                    Bot Trading Pro 24/7 RÉEL
                 </h1>
-                <p class="text-gray-400 mt-2">Trading PancakeSwap BSC • Meilleur DEX • Automatique 24/7</p>
+                <p class="text-gray-400 mt-2">🤖 Auto • 🌊 BSC • 💎 Multi-DEX • 📱 Telegram • ⚡ On-Chain</p>
             </div>
             
             <div class="flex gap-3">
-                <button onclick="openTelegramChat()" class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 rounded-lg font-semibold transition-all">
-                    <span>💬</span>
-                    Communauté
-                    <span>↗</span>
-                </button>
-                
-                <button onclick="openDCASwap()" class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-lg font-semibold transition-all">
-                    <span>🔄</span>
-                    DCA/Swap
-                    <span>↗</span>
+                <button onclick="openTelegramChannel()" class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:opacity-90 rounded-lg font-semibold transition-all shadow-lg">
+                    <span>📱</span>
+                    Telegram
+                    <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full pulse">LIVE</span>
                 </button>
                 
                 <button onclick="connectWallet()" id="connectBtn" class="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600">
                     <span>👛</span>
-                    <span id="walletText">Connecter MetaMask</span>
+                    <span id="walletText">Connecter BSC</span>
                 </button>
             </div>
         </div>
 
-        <div id="subscriptionSection" class="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-500 rounded-xl p-6 mb-6 hidden">
-            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-                <span>💎</span>
-                Abonnement Bot Trading Pro
-            </h3>
-            
-            <div id="freeTrialInfo" class="bg-green-500/20 border border-green-500 rounded-lg p-4 mb-4">
-                <p class="text-green-300 font-bold mb-2">🎁 OFFRE DE LANCEMENT</p>
-                <p class="text-sm text-green-200">
-                    ✅ 2 jours GRATUITS pour tester le bot<br>
-                    ✅ Toutes les fonctionnalités incluses<br>
-                    ✅ Trading réel + Simulation<br>
-                    <span id="trialDaysRemaining" class="font-bold text-green-400"></span>
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div class="bg-slate-700/50 border-2 border-slate-600 rounded-lg p-4 hover:border-purple-400 transition-all cursor-pointer" onclick="selectPlan(1, 1)">
-                    <div class="text-center">
-                        <p class="text-2xl font-bold text-purple-400">1 USDT</p>
-                        <p class="text-sm text-gray-400 mt-1">1 jour</p>
-                        <p class="text-xs text-gray-500 mt-2">Essai simple</p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-700/50 border-2 border-purple-500 rounded-lg p-4 hover:border-purple-400 transition-all cursor-pointer relative" onclick="selectPlan(7, 6)">
-                    <div class="absolute -top-3 -right-3 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full">
-                        -14%
-                    </div>
-                    <div class="text-center">
-                        <p class="text-2xl font-bold text-purple-400">6 USDT</p>
-                        <p class="text-sm text-gray-400 mt-1">7 jours</p>
-                        <p class="text-xs text-gray-500 mt-2">0.86 USDT/jour</p>
-                        <p class="text-xs text-green-400 mt-1">⭐ Populaire</p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-700/50 border-2 border-yellow-500 rounded-lg p-4 hover:border-purple-400 transition-all cursor-pointer relative" onclick="selectPlan(30, 20)">
-                    <div class="absolute -top-3 -right-3 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full">
-                        -33%
-                    </div>
-                    <div class="text-center">
-                        <p class="text-2xl font-bold text-yellow-400">20 USDT</p>
-                        <p class="text-sm text-gray-400 mt-1">30 jours</p>
-                        <p class="text-xs text-gray-500 mt-2">0.67 USDT/jour</p>
-                        <p class="text-xs text-yellow-400 mt-1">🏆 Meilleure valeur</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="selectedPlanInfo" class="bg-blue-500/20 border border-blue-500 rounded-lg p-4 mb-4 hidden">
-                <p class="text-blue-300 font-bold mb-2">📋 Forfait sélectionné</p>
-                <p class="text-sm text-blue-200">
-                    <span id="planDuration"></span> jours pour <span id="planPrice"></span> USDT
-                </p>
-            </div>
-
-            <button onclick="processPayment()" id="paymentBtn" class="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                <span>💳</span>
-                <span id="paymentBtnText">Sélectionnez un forfait</span>
-            </button>
-
-            <div class="mt-4 p-3 bg-slate-700/50 rounded-lg">
-                <p class="text-xs text-gray-400 text-center">
-                    🔒 Paiement sécurisé via BSC • Pas de données bancaires requises
-                </p>
-            </div>
-        </div>
-
-        <div id="cryptoSelector" class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 mb-6 hidden">
+        <!-- Multi-Wallet Manager -->
+        <div id="multiWalletSection" class="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-500 rounded-xl p-6 mb-6 hidden">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">Sélectionner la Crypto</h3>
-                <button onclick="fetchCryptoList()" id="refreshBtn" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-all">
-                    <span id="refreshIcon">🔄</span>
-                    <span id="refreshText">Actualiser</span>
+                <div>
+                    <h3 class="text-2xl font-bold flex items-center gap-2">
+                        <span>💼</span>
+                        Gestion Multi-Wallet
+                    </h3>
+                    <p class="text-sm text-gray-300 mt-1">Diversifiez vos positions sur plusieurs wallets</p>
+                </div>
+                <button onclick="addWallet()" class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 rounded-lg font-semibold transition-all">
+                    + Ajouter Wallet
                 </button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">Cryptomonnaie <span id="cryptoCount"></span></label>
-                    <select id="cryptoSelect" onchange="changeCrypto()" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-400 text-lg font-semibold cursor-pointer">
-                        <option>Chargement...</option>
-                    </select>
-                    <p class="text-xs text-gray-400 mt-2">🥞 = PancakeSwap OK • 🎮 = Simulation</p>
-                </div>
-                
-                <div>
-                    <label class="block text-sm text-gray-400 mb-2">Mode de Trading</label>
-                    <select id="tradingMode" onchange="changeTradingMode()" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-400 text-lg font-semibold cursor-pointer">
-                        <option value="simulation">🎮 Simulation</option>
-                        <option value="real">🥞 Réel (PancakeSwap)</option>
-                    </select>
-                    <p class="text-xs text-gray-400 mt-2" id="modeInfo">⚠️ Activez uniquement si vous comprenez les risques</p>
-                </div>
+
+            <div id="walletsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Wallets seront ajoutés ici -->
             </div>
         </div>
 
-        <div id="privateKeySection" class="bg-gradient-to-r from-red-500/20 to-orange-500/20 border-2 border-red-500 rounded-xl p-6 mb-6 hidden">
+        <!-- Mode 24/7 Configuration -->
+        <div id="autoModeSection" class="bg-gradient-to-r from-red-500/20 to-orange-500/20 border-2 border-red-500 rounded-xl p-6 mb-6 hidden">
             <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
                 <span>🔐</span>
-                Trading Automatique 24/7 (Optionnel)
+                Configuration Trading 24/7 Automatique
             </h3>
             
             <div class="bg-red-900/30 border border-red-500 rounded-lg p-4 mb-4">
                 <p class="text-red-300 font-bold mb-2">⚠️ AVERTISSEMENTS CRITIQUES</p>
                 <ul class="text-sm text-red-200 space-y-1">
-                    <li>• Utilisez UNIQUEMENT un wallet dédié avec petit capital</li>
-                    <li>• Votre clé privée ne sera JAMAIS sauvegardée</li>
-                    <li>• Stockée uniquement en mémoire pendant la session</li>
-                    <li>• Effacée automatiquement à la fermeture de l'onglet</li>
-                    <li>• Laissez vide pour utiliser MetaMask (manuel)</li>
+                    <li>• Utilisez UNIQUEMENT un wallet dédié au trading</li>
+                    <li>• Ne mettez que le capital que vous pouvez perdre</li>
+                    <li>• La clé est stockée EN MÉMOIRE uniquement (effacée à la fermeture)</li>
+                    <li>• Système anti-veille activé automatiquement</li>
+                    <li>• Gardez l'onglet ouvert pour le mode 24/7</li>
+                    <li>• Stop-loss automatique pour limiter les pertes</li>
+                    <li>• Toutes les transactions sont RÉELLES sur BSC Mainnet</li>
                 </ul>
             </div>
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm text-gray-400 mb-2">Clé Privée (pour trading automatique sans confirmation)</label>
-                    <input type="password" id="privateKeyInput" placeholder="0x... ou laisser vide pour MetaMask" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-red-400">
+                    <label class="block text-sm text-gray-400 mb-2">Clé Privée du Wallet de Trading</label>
+                    <input type="password" id="privateKeyInput" placeholder="0x... (optionnel - laissez vide pour MetaMask manuel)" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-red-400">
                     <p class="text-xs text-gray-400 mt-1">
-                        <span class="text-yellow-400">⚡</span> Vide = Mode manuel (MetaMask) | Rempli = Mode automatique 24/7
+                        <span class="text-yellow-400">⚡</span> Mode auto 24/7 si remplie | Mode manuel MetaMask si vide
                     </p>
                 </div>
                 
                 <button onclick="togglePrivateKeyVisibility()" class="text-sm text-blue-400 hover:underline">
                     👁️ Afficher/Masquer la clé
                 </button>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="activateAutoMode()" id="activateAutoBtn" class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 rounded-lg font-semibold transition-all">
+                        ✅ Activer Mode Auto 24/7
+                    </button>
+                    <button onclick="deactivateAutoMode()" id="deactivateAutoBtn" class="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 rounded-lg font-semibold transition-all hidden">
+                        ⏸️ Désactiver Mode Auto
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div id="capitalSection" class="bg-gradient-to-r from-yellow-400/20 to-orange-500/20 border-2 border-yellow-400 rounded-xl p-6 mb-6 hidden">
+        <!-- Stop-Loss & Take-Profit -->
+        <div id="riskManagementSection" class="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-2 border-yellow-500 rounded-xl p-6 mb-6 hidden">
             <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-                <span>🎯</span>
-                Capital de trading en USDT
+                <span>🛡️</span>
+                Gestion des Risques Automatique
             </h3>
-            <p class="text-gray-300 mb-4">
-                Montant en USDT pour le trading automatique
-                <br />
-                <span class="text-sm text-gray-400">Solde disponible: <span id="availableBalance" class="font-bold text-green-400">0</span> USDT</span>
-            </p>
-            <div class="flex gap-4 mb-3">
-                <input type="number" id="capitalInput" placeholder="Ex: 50" step="10" class="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-400">
-                <button onclick="setCapital()" class="px-8 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 rounded-lg font-semibold transition-all">
-                    Valider
-                </button>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="setMaxCapital()" class="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition-all">
-                    💯 Utiliser 100%
-                </button>
-                <button onclick="setHalfCapital()" class="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition-all">
-                    ➗ Utiliser 50%
-                </button>
-                <button onclick="syncWalletBalance()" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition-all">
-                    🔄 Actualiser
-                </button>
-            </div>
-        </div>
 
-        <div id="statsCards" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 hidden">
-            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
-                <p class="text-gray-400 text-xs">Capital</p>
-                <p class="text-xl font-bold mt-1 text-green-400">$<span id="capitalDisplay">0</span></p>
-            </div>
-            
-            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
-                <p class="text-gray-400 text-xs">Prix <span id="cryptoName">BTC</span></p>
-                <p class="text-xl font-bold mt-1">$<span id="currentPrice">...</span></p>
-            </div>
-            
-            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
-                <p class="text-gray-400 text-xs">Profit</p>
-                <p class="text-xl font-bold mt-1 text-green-400">$<span id="profitDisplay">0.00</span></p>
-            </div>
-            
-            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
-                <p class="text-gray-400 text-xs">Mode</p>
-                <p class="text-xl font-bold mt-1" id="modeDisplay">🎮 SIM</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 space-y-6">
-                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-2xl font-bold">📈 Graphique de Trading</h2>
-                        <div class="text-sm text-gray-400">
-                            <span id="chartCrypto">BTC</span>/USDT
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Stop-Loss -->
+                <div class="bg-slate-800/50 rounded-xl p-4 border border-red-500/30">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-red-400 text-2xl">🛑</span>
+                            <div>
+                                <p class="font-bold text-red-400">Stop-Loss</p>
+                                <p class="text-xs text-gray-400">Protection contre les pertes</p>
+                            </div>
                         </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="stopLossToggle" checked class="sr-only peer" onchange="toggleStopLoss()">
+                            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                        </label>
                     </div>
+                    <div id="stopLossSettings">
+                        <label class="block text-xs text-gray-400 mb-1">Perte Maximum (%)</label>
+                        <input type="number" id="stopLossPercent" value="-3" step="0.5" max="-0.5" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-red-400">
+                        <p class="text-xs text-gray-500 mt-1">Vente auto si perte ≥ ce %</p>
+                    </div>
+                </div>
+
+                <!-- Take-Profit -->
+                <div class="bg-slate-800/50 rounded-xl p-4 border border-green-500/30">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-400 text-2xl">💰</span>
+                            <div>
+                                <p class="font-bold text-green-400">Take-Profit</p>
+                                <p class="text-xs text-gray-400">Sécurisation des gains</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="takeProfitToggle" checked class="sr-only peer" onchange="toggleTakeProfit()">
+                            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                        </label>
+                    </div>
+                    <div id="takeProfitSettings">
+                        <label class="block text-xs text-gray-400 mb-1">Profit Cible (%)</label>
+                        <input type="number" id="takeProfitPercent" value="5" step="0.5" min="1" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-green-400">
+                        <p class="text-xs text-gray-500 mt-1">Vente auto si profit ≥ ce %</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <p class="text-xs text-blue-200">
+                    💡 <strong>Conseil :</strong> Stop-Loss à -3% et Take-Profit à +5% = ratio risque/rendement 1:1.67
+                </p>
+            </div>
+        </div>
+
+        <!-- Telegram Notifications -->
+        <div id="telegramSection" class="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-2 border-blue-500 rounded-xl p-6 mb-6 hidden">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span>📱</span>
+                Notifications Telegram
+            </h3>
+
+            <div class="bg-blue-900/30 border border-blue-500 rounded-lg p-4 mb-4">
+                <p class="text-blue-300 font-bold mb-2">🤖 Configuration Bot Telegram</p>
+                <ol class="text-sm text-blue-200 space-y-1">
+                    <li>1. Créez un bot via @BotFather sur Telegram</li>
+                    <li>2. Copiez le token du bot</li>
+                    <li>3. Démarrez une conversation avec votre bot</li>
+                    <li>4. Récupérez votre Chat ID via @userinfobot</li>
+                </ol>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Bot Token</label>
+                    <input type="password" id="telegramBotToken" placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-400">
+                </div>
+
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Chat ID</label>
+                    <input type="text" id="telegramChatId" placeholder="123456789" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-400">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="testTelegramNotification()" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-all">
+                        🧪 Tester Notification
+                    </button>
+                    <button onclick="saveTelegramConfig()" class="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition-all">
+                        💾 Sauvegarder Config
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Arbitrage Panel -->
+        <div id="arbitragePanel" class="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-2 border-green-500 rounded-xl p-6 mb-6 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h3 class="text-2xl font-bold flex items-center gap-2">
+                        <span>💎</span>
+                        Arbitrage Multi-DEX RÉEL (BSC Mainnet)
+                    </h3>
+                    <p class="text-sm text-gray-300 mt-1">Prix on-chain • PancakeSwap, Biswap, ApeSwap • Exécution auto 24/7</p>
+                </div>
+                <button onclick="toggleArbitrage()" id="arbitrageToggle" class="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all bg-green-600 hover:bg-green-700">
+                    <span id="arbIcon">▶️</span>
+                    <span id="arbText">Démarrer</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
+                    <label class="block text-sm text-gray-400 mb-2">Profit Minimum (%)</label>
+                    <input type="number" id="minArbitrageProfit" value="0.5" step="0.1" min="0.1" max="10" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-green-400">
+                    <p class="text-xs text-gray-400 mt-1">Profit net minimum après frais</p>
+                </div>
+
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
+                    <label class="block text-sm text-gray-400 mb-2">Montant par Arbitrage (USDT)</label>
+                    <input type="number" id="arbitrageAmount" value="50" step="10" min="10" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-green-400">
+                    <p class="text-xs text-gray-400 mt-1">Montant USDT par exécution</p>
+                </div>
+
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
+                    <label class="block text-sm text-gray-400 mb-2">Fréquence Scan (sec)</label>
+                    <input type="number" id="arbitrageScanInterval" value="10" step="5" min="5" max="60" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-green-400">
+                    <p class="text-xs text-gray-400 mt-1">Intervalle entre chaque scan</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-green-600 rounded-xl p-4">
+                    <p class="text-gray-400 text-xs">Opportunités Détectées</p>
+                    <p class="text-2xl font-bold mt-1 text-green-400"><span id="arbOpportunities">0</span></p>
+                </div>
+                
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-blue-600 rounded-xl p-4">
+                    <p class="text-gray-400 text-xs">Arbitrages Exécutés</p>
+                    <p class="text-2xl font-bold mt-1 text-blue-400"><span id="arbExecuted">0</span></p>
+                </div>
+                
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-yellow-600 rounded-xl p-4">
+                    <p class="text-gray-400 text-xs">Profit Total Arbitrage</p>
+                    <p class="text-2xl font-bold mt-1 text-yellow-400">$<span id="arbProfit">0.00</span></p>
+                </div>
+
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-purple-600 rounded-xl p-4">
+                    <p class="text-gray-400 text-xs">Meilleur Profit</p>
+                    <p class="text-2xl font-bold mt-1 text-purple-400"><span id="arbBestProfit">0.00</span>%</p>
+                </div>
+            </div>
+
+            <div id="arbitrageOpportunities" class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
+                <h4 class="text-lg font-bold mb-3 flex items-center gap-2">
+                    <span>🎯</span>
+                    Opportunités en Temps Réel (On-Chain)
+                </h4>
+                <div id="arbOpportunitiesList">
+                    <div class="text-center py-8 text-gray-400">
+                        <span class="text-4xl">🔍</span>
+                        <p>Cliquez sur "Démarrer" pour scanner...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <p class="text-xs text-blue-200">
+                    💡 <strong>Mode Auto 24/7 :</strong> Si activé, les opportunités seront exécutées automatiquement dès détection !
+                </p>
+            </div>
+        </div>
+
+        <!-- Dashboard Statistiques Avancées -->
+        <div id="statsSection" class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 mb-6 hidden">
+            <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <span>📊</span>
+                Dashboard Trading
+            </h3>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500 rounded-xl p-4">
+                    <p class="text-gray-400 text-xs">Profit Total</p>
+                    <p class="text-2xl font-bold mt-1 text-green-400">$<span id="totalProfit">0.00</span></p>
+                    <p class="text-xs text-green-300 mt-1">+<span id="totalProfitPercent">0.00</span>%</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500 rounded-xl p-4">
+                    <p class="text-gray-400 text-xs">Trades Gagnants</p>
+                    <p class="text-2xl font-bold mt-1 text-blue-400"><span id="winningTrades">0</span></p>
+                    <p class="text-xs text-blue-300 mt-1">Win Rate: <span id="winRate">0</span>%</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-red-500/20 to-pink-500/20 border border-red-500 rounded-xl p-4">
+                    <p class="text-gray-400 text-xs">Trades Perdants</p>
+                    <p class="text-2xl font-bold mt-1 text-red-400"><span id="losingTrades">0</span></p>
+                    <p class="text-xs text-red-300 mt-1">Perte Moy: <span id="avgLoss">0</span>%</p>
+                </div>
+
+                <div class="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500 rounded-xl p-4">
+                    <p class="text-gray-400 text-xs">Ratio R/R</p>
+                    <p class="text-2xl font-bold mt-1 text-yellow-400"><span id="riskRewardRatio">0</span></p>
+                    <p class="text-xs text-yellow-300 mt-1">Sharpe: <span id="sharpeRatio">0</span></p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Performance Chart -->
+                <div class="bg-slate-700/50 rounded-xl p-4">
+                    <h4 class="font-bold mb-3">📈 Performance Cumulée</h4>
                     <div class="h-64">
-                        <canvas id="tradingChart"></canvas>
+                        <canvas id="performanceChart"></canvas>
                     </div>
                 </div>
 
-                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
-                    <h2 class="text-2xl font-bold mb-4">Stratégies</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="strategiesGrid"></div>
-                </div>
-
-                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-2xl font-bold">Historique des Trades</h2>
-                        <button onclick="toggleBot()" id="toggleBotBtn" disabled class="flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-all bg-gray-600 cursor-not-allowed">
-                            <span id="botIcon">▶️</span>
-                            <span id="botText">Démarrer</span>
-                        </button>
-                    </div>
-                    <div id="tradesContainer">
-                        <div class="text-center py-8 text-gray-400">
-                            <span class="text-4xl">⚠️</span>
-                            <p>Aucun trade</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
-                <h2 class="text-2xl font-bold mb-4">Paramètres</h2>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-2">% par trade</label>
-                        <input type="number" id="tradePercent" value="10" min="1" max="100" onchange="updateTradeAmount()" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-400">
-                        <p class="text-xs text-gray-400 mt-1">Montant: $<span id="tradeAmount">0</span></p>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-2">Slippage (%)</label>
-                        <input type="number" id="slippage" value="1" step="0.1" min="0.1" max="10" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-400">
-                        <p class="text-xs text-gray-400 mt-1">⚠️ PancakeSwap recommandé: 0.5-1%</p>
-                    </div>
-                </div>
-
-                <div class="mt-6 p-4 bg-green-400/10 border border-green-400/30 rounded-lg">
-                    <div class="flex gap-2">
-                        <span class="text-green-400">💰</span>
-                        <div class="text-sm text-gray-300">
-                            <p class="font-semibold text-green-400">Soldes</p>
-                            <p>BNB: <span id="bnbBalance">0</span></p>
-                            <p>USDT: $<span id="usdtBalance">0</span></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 p-4 bg-blue-400/10 border border-blue-400/30 rounded-lg">
-                    <div class="flex gap-2">
-                        <span class="text-blue-400">📊</span>
-                        <div class="text-sm text-gray-300">
-                            <p class="font-semibold text-blue-400">Statut</p>
-                            <p>Wallet: <span id="walletStatus">🔴 Non connecté</span></p>
-                            <p>Mode: <span id="tradingTypeStatus">🟡 ...</span></p>
-                            <p>Position: <span id="positionStatus">⚪ Aucune</span></p>
-                            <p>Binance: <span id="apiStatus">🟡 ...</span></p>
-                            <p>Ethers: <span id="ethersStatus">🟡 ...</span></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 p-4 bg-red-400/10 border border-red-400/30 rounded-lg">
-                    <div class="flex gap-2">
-                        <span class="text-red-400">⚠️</span>
-                        <div class="text-xs text-gray-300">
-                            <p class="font-semibold text-red-400">ATTENTION</p>
-                            <p>• Risque de perte totale</p>
-                            <p>• Frais gas BSC (~0.003-0.01 BNB)</p>
-                            <p>• Minimum 0.02 BNB pour gas</p>
-                            <p>• Montant minimum: 10 USDT</p>
-                            <p>• Slippage PancakeSwap: 0.5-1%</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-4 p-4 bg-blue-400/10 border border-blue-400/30 rounded-lg">
-                    <div class="flex gap-2">
-                        <span class="text-blue-400">💬</span>
-                        <div class="text-sm text-gray-300">
-                            <p class="font-semibold text-blue-400">Communauté</p>
-                            <button onclick="openTelegramChat()" class="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-sm font-semibold transition-all">
-                                <span>📱</span>
-                                Rejoindre Telegram
-                                <span>↗</span>
-                            </button>
-                            <p class="text-xs text-gray-400 mt-2">Échangez avec la communauté, partagez vos stratégies et suivez les signaux</p>
-                        </div>
+                <!-- Distribution des Profits -->
+                <div class="bg-slate-700/50 rounded-xl p-4">
+                    <h4 class="font-bold mb-3">📊 Distribution Profits/Pertes</h4>
+                    <div class="h-64">
+                        <canvas id="distributionChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script>
-        // PancakeSwap BSC Configuration
-        const PANCAKESWAP_ROUTER = '0x10ED43C718714eb63d5aA57B78B54704E256024E'; // PancakeSwap V2 Router
-        const USDT_CONTRACT = '0x55d398326f99059fF775485246999027B3197955';
-        const WBNB_CONTRACT = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c';
-        const BSC_RPC = 'https://bsc-dataseed1.binance.org';
-        const TELEGRAM_GROUP = 'https://t.me/+votre_lien_telegram';
-        const FREE_TRIAL_DAYS = 2;
-        const OWNER_WALLET = '0xVotreAdresseIci'; // Remplacez par votre adresse
-
-        // ABI PancakeSwap Router
-        const PANCAKESWAP_ROUTER_ABI = [
-            'function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)',
-            'function getAmountsOut(uint amountIn, address[] memory path) public view returns (uint[] memory amounts)',
-            'function WETH() external pure returns (address)'
-        ];
-
-        const ERC20_ABI = [
-            'function approve(address spender, uint256 amount) public returns (bool)',
-            'function allowance(address owner, address spender) public view returns (uint256)',
-            'function balanceOf(address account) public view returns (uint256)',
-            'function decimals() public view returns (uint8)',
-            'function transfer(address to, uint256 amount) public returns (bool)'
-        ];
-
-        let state = {
-            account: null, 
-            isConnected: false, 
-            balanceBNB: '0', 
-            balanceUSDT: '0',
-            selectedCrypto: 'BTCUSDT', 
-            cryptoList: [], 
-            currentPrice: null, 
-            priceHistory: [],
-            tradingCapital: 0, 
-            capitalSet: false, 
-            tradingMode: 'simulation',
-            botRunning: false, 
-            trades: [], 
-            portfolio: { profit: 0, profitPercent: 0 },
-            indicators: { rsi: 50, macd: { histogram: 0 }, ema20: 0, ema50: 0 },
-            selectedStrategy: 'scalping', 
-            provider: null,
-            privateKey: null,
-            wallet: null,
-            autoMode: false,
-            currentPosition: null,
-            lastBuyPrice: 0,
-            positionAmount: 0,
-            lastSellTime: 0,
-            chartData: { labels: [], prices: [], buyPoints: [], sellPoints: [] },
-            subscription: {
-                isActive: false,
-                expiryDate: null,
-                firstAccessDate: null,
-                selectedPlan: null
-            }
-        };
-
-        let ws = null, botInterval = null, lastTradeTime = 0;
-        let tradingChart = null;
-        let priceSimulationInterval = null;
-        let wsConnectionAttempts = 0;
-        const MAX_WS_ATTEMPTS = 3;
-        const POST_SELL_COOLDOWN = 120000;
-
-        const TOKEN_ADDRESSES = {
-            'BTCUSDT': '0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c',
-            'ETHUSDT': '0x2170Ed0880ac9A755fd29B2688956BD959F933F8',
-            'BNBUSDT': '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
-            'ADAUSDT': '0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47',
-            'DOGEUSDT': '0xbA2aE424d960c26247Dd6c32edC70B295c744C43',
-            'SOLUSDT': '0x570A5D26f7765Ecb712C0924E4De545B89fD43dF',
-            'MATICUSDT': '0xCC42724C6683B7E57334c4E856f4c9965ED682bD',
-            'LINKUSDT': '0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD',
-            'AVAXUSDT': '0x1CE0c2827e2eF14D5C4f29a091d735A204794041',
-            'LTCUSDT': '0x4338665CBB7B2485A8855A139b75D5e34AB0DB94',
-            'CAKEUSDT': '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82',
-            'UNIUSDT': '0xBf5140A22578168FD562DCcF235E5D43A02ce9B1',
-            'ATOMUSDT': '0x0Eb3a705fc54725037CC9e008bDede697f62F335'
-        };
-
-        const strategies = {
-            scalping: { 
-                name: 'Scalping', 
-                description: 'Rapide RSI+MACD', 
-                minTradeInterval: 180000,
-                rsiBuyThreshold: 40,
-                rsiBuyStrong: 30,
-                rsiSellThreshold: 60,
-                rsiSellStrong: 70,
-                takeProfit: 1.5,
-                stopLoss: -2.0
-            },
-            swing: { 
-                name: 'Swing', 
-                description: 'Positions EMA', 
-                minTradeInterval: 900000,
-                rsiBuyThreshold: 35,
-                rsiBuyStrong: 25,
-                rsiSellThreshold: 70,
-                rsiSellStrong: 75,
-                takeProfit: 1.5,
-                stopLoss: -2.0
-            },
-            arbitrage: { 
-                name: 'Arbitrage', 
-                description: 'Diff prix', 
-                minTradeInterval: 60000,
-                rsiBuyThreshold: 45,
-                rsiBuyStrong: 35,
-                rsiSellThreshold: 55,
-                rsiSellStrong: 65,
-                takeProfit: 1.5,
-                stopLoss: -2.0
-            }
-        };
-
-        window.addEventListener('DOMContentLoaded', () => {
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            console.log('🥞 Bot de Trading Multi-Crypto Pro v3.0 - PancakeSwap');
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            console.log('');
-            
-            if (typeof ethers !== 'undefined') {
-                document.getElementById('ethersStatus').innerHTML = '🟢 v' + ethers.version;
-                console.log('✅ Ethers.js v' + ethers.version + ' - Prêt pour BSC');
-            } else {
-                document.getElementById('ethersStatus').innerHTML = '🔴 Erreur';
-                console.error('❌ Ethers.js non chargé');
-            }
-            
-            initChart();
-            renderStrategies();
-            loadDefaultCryptoList();
-            
-            setTimeout(() => {
-                fetchCryptoList().catch(() => {});
-            }, 2000);
-        });
-
-        function initChart() {
-            const ctx = document.getElementById('tradingChart').getContext('2d');
-            tradingChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Prix',
-                        data: [],
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.4,
-                        pointRadius: 0,
-                        borderWidth: 2,
-                        fill: true
-                    }, {
-                        label: 'Achats',
-                        data: [],
-                        backgroundColor: 'rgb(34, 197, 94)',
-                        pointRadius: 8,
-                        pointStyle: 'triangle',
-                        showLine: false,
-                        pointRotation: 0
-                    }, {
-                        label: 'Ventes',
-                        data: [],
-                        backgroundColor: 'rgb(239, 68, 68)',
-                        pointRadius: 8,
-                        pointStyle: 'triangle',
-                        showLine: false,
-                        pointRotation: 180
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { duration: 500, easing: 'easeInOutQuart' },
-                    plugins: {
-                        legend: { display: true, labels: { color: 'rgb(156, 163, 175)' } },
-                        tooltip: { mode: 'index', intersect: false, enabled: true }
-                    },
-                    scales: {
-                        x: {
-                            display: true,
-                            grid: { color: 'rgba(75, 85, 99, 0.3)', drawBorder: false },
-                            ticks: { color: 'rgb(156, 163, 175)', maxTicksLimit: 10, maxRotation: 0 }
-                        },
-                        y: {
-                            display: true,
-                            grid: { color: 'rgba(75, 85, 99, 0.3)', drawBorder: false },
-                            ticks: { 
-                                color: 'rgb(156, 163, 175)',
-                                callback: function(value) { return '
-                 + value.toFixed(2); }
-                            }
-                        }
-                    },
-                    interaction: { mode: 'nearest', axis: 'x', intersect: false }
-                }
-            });
-        }
-
-        function updateChart() {
-            if (!tradingChart || state.priceHistory.length === 0) return;
-            
-            const maxPoints = 50;
-            const prices = state.priceHistory.slice(-maxPoints);
-            const labels = prices.map((_, i) => {
-                const date = new Date(Date.now() - (maxPoints - i) * 500);
-                return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            });
-            
-            const buyPoints = new Array(prices.length).fill(null);
-            const sellPoints = new Array(prices.length).fill(null);
-            
-            state.trades.slice(0, 10).forEach(trade => {
-                const tradePrice = parseFloat(trade.entryPrice);
-                const closestIndex = prices.length - Math.floor(Math.random() * 5) - 1;
-                if (closestIndex >= 0 && closestIndex < prices.length) {
-                    if (trade.type === 'BUY') {
-                        buyPoints[closestIndex] = tradePrice;
-                    } else {
-                        sellPoints[closestIndex] = tradePrice;
-                    }
-                }
-            });
-            
-            tradingChart.data.labels = labels;
-            tradingChart.data.datasets[0].data = prices;
-            tradingChart.data.datasets[1].data = buyPoints;
-            tradingChart.data.datasets[2].data = sellPoints;
-            tradingChart.update('active');
-        }
-
-        function renderStrategies() {
-            document.getElementById('strategiesGrid').innerHTML = Object.entries(strategies).map(([key, s]) => {
-                const intervalMinutes = s.minTradeInterval / 60000;
-                const intervalDisplay = intervalMinutes >= 1 ? `${intervalMinutes} min` : `${s.minTradeInterval / 1000}s`;
-                
-                return `
-                <div onclick="selectStrategy('${key}')" class="p-4 rounded-lg border-2 ${state.selectedStrategy === key ? 'border-yellow-400 bg-yellow-400/10' : 'border-slate-600'} cursor-pointer hover:border-yellow-400/50 transition-all">
-                    <h3 class="font-bold mb-2">${s.name}</h3>
-                    <p class="text-gray-400 text-sm mb-2">${s.description}</p>
-                    <div class="text-xs text-gray-500 space-y-0.5">
-                        <p>📊 Achat: RSI &lt; ${s.rsiBuyThreshold}</p>
-                        <p>🎯 TP: +${s.takeProfit}% | SL: ${s.stopLoss}%</p>
-                        <p>⏱️ Cooldown: ${intervalDisplay}</p>
-                    </div>
+        <!-- Graphique du Token Tradé -->
+        <div id="tokenChartSection" class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 mb-6 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h3 class="text-2xl font-bold flex items-center gap-2">
+                        <span>📈</span>
+                        Graphique <span id="currentTokenName" class="text-yellow-400">BTC</span>/USDT
+                    </h3>
+                    <p class="text-sm text-gray-400 mt-1">Prix en temps réel Binance WebSocket</p>
                 </div>
-            `}).join('');
-        }
+                <div class="flex gap-2">
+                    <button onclick="changeTimeframe('1m')" class="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-sm">1m</button>
+                    <button onclick="changeTimeframe('5m')" class="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-sm">5m</button>
+                    <button onclick="changeTimeframe('15m')" class="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-sm">15m</button>
+                    <button onclick="changeTimeframe('1h')" class="px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-sm">1h</button>
+                </div>
+            </div>
 
-        function selectStrategy(key) {
-            state.selectedStrategy = key;
-            renderStrategies();
-            console.log(`✅ Stratégie: ${strategies[key].name}`);
-        }
+            <div class="h-96 mb-4">
+                <canvas id="tokenChart"></canvas>
+            </div>
 
-        function openDCASwap() {
-            window.open('https://reboot-20.vercel.app/', '_blank');
-        }
-        
-        function openTelegramChat() {
-            window.open(TELEGRAM_GROUP, '_blank');
-        }
+            <div class="grid grid-cols-4 gap-3">
+                <div class="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                    <p class="text-xs text-gray-400">Prix Actuel</p>
+                    <p class="text-lg font-bold text-blue-400">$<span id="liveTokenPrice">0</span></p>
+                </div>
+                <div class="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                    <p class="text-xs text-gray-400">RSI (14)</p>
+                    <p class="text-lg font-bold text-purple-400"><span id="liveRSI">50</span></p>
+                </div>
+                <div class="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                    <p class="text-xs text-gray-400">EMA 20</p>
+                    <p class="text-lg font-bold text-yellow-400">$<span id="liveEMA20">0</span></p>
+                </div>
+                <div class="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                    <p class="text-xs text-gray-400">Volume 24h</p>
+                    <p class="text-lg font-bold text-red-400">$<span id="liveVolume">0</span>M</p>
+                </div>
+            </div>
+        </div>
 
-        function togglePrivateKeyVisibility() {
-            const input = document.getElementById('privateKeyInput');
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
-
-        async function connectWallet() {
-            if (!window.ethereum) {
-                alert('❌ MetaMask non installé');
-                window.open('https://metamask.io/download/', '_blank');
-                return;
-            }
-
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                
-                if (chainId !== '0x38') {
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x38' }]
-                        });
-                    } catch (switchError) {
-                        if (switchError.code === 4902) {
-                            await window.ethereum.request({
-                                method: 'wallet_addEthereumChain',
-                                params: [{
-                                    chainId: '0x38',
-                                    chainName: 'BNB Smart Chain',
-                                    nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-                                    rpcUrls: ['https://bsc-dataseed1.binance.org'],
-                                    blockExplorerUrls: ['https://bscscan.com']
-                                }]
-                            });
-                        }
-                    }
-                }
-                
-                state.account = accounts[0];
-                state.provider = new ethers.providers.Web3Provider(window.ethereum);
-                
-                const bnbBalance = await state.provider.getBalance(state.account);
-                state.balanceBNB = ethers.utils.formatEther(bnbBalance);
-                
-                const usdtBalance = await getTokenBalance(USDT_CONTRACT, state.account);
-                state.balanceUSDT = ethers.utils.formatUnits(usdtBalance, 18);
-                
-                state.isConnected = true;
-                
-                console.log('✅ Wallet connecté:', state.account);
-                console.log('💰 BNB:', state.balanceBNB);
-                console.log('💵 USDT:', state.balanceUSDT);
-                
-                checkSubscription();
-                updateUI();
-                
-                alert(`✅ Wallet connecté !\n\nBNB: ${parseFloat(state.balanceBNB).toFixed(4)}\nUSDT: ${parseFloat(state.balanceUSDT).toFixed(2)}`);
-            } catch (error) {
-                console.error('❌ Erreur:', error);
-                alert('❌ Erreur: ' + error.message);
-            }
-        }
-
-        function checkSubscription() {
-            const walletLower = state.account.toLowerCase();
+        <!-- Trading Controls -->
+        <div id="tradingSection" class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 mb-6 hidden">
+            <h3 class="text-2xl font-bold mb-4">🤖 Contrôles de Trading (Stratégie RSI + EMA)</h3>
             
-            const savedSub = localStorage.getItem(`subscription_${walletLower}`);
-            if (savedSub) {
-                const subData = JSON.parse(savedSub);
-                const expiryDate = new Date(subData.expiryDate);
-                if (new Date() < expiryDate) {
-                    state.subscription.isActive = true;
-                    state.subscription.expiryDate = expiryDate;
-                    document.getElementById('subscriptionSection').classList.add('hidden');
-                    document.getElementById('cryptoSelector').classList.remove('hidden');
-                    return true;
-                }
-            }
-            
-            const firstAccess = localStorage.getItem(`first_access_${walletLower}`);
-            if (!firstAccess) {
-                const now = new Date();
-                const expiryDate = new Date(now.getTime() + FREE_TRIAL_DAYS * 24 * 60 * 60 * 1000);
-                localStorage.setItem(`first_access_${walletLower}`, now.toISOString());
-                localStorage.setItem(`subscription_${walletLower}`, JSON.stringify({
-                    expiryDate: expiryDate.toISOString(),
-                    firstAccessDate: now.toISOString(),
-                    isTrial: true
-                }));
-                state.subscription.isActive = true;
-                state.subscription.expiryDate = expiryDate;
-                document.getElementById('subscriptionSection').classList.remove('hidden');
-                setTimeout(() => {
-                    document.getElementById('subscriptionSection').classList.add('hidden');
-                    document.getElementById('cryptoSelector').classList.remove('hidden');
-                }, 5000);
-                return true;
-            } else {
-                const trialExpiryDate = new Date(new Date(firstAccess).getTime() + FREE_TRIAL_DAYS * 24 * 60 * 60 * 1000);
-                if (new Date() >= trialExpiryDate) {
-                    document.getElementById('subscriptionSection').classList.remove('hidden');
-                    return false;
-                }
-                state.subscription.isActive = true;
-                state.subscription.expiryDate = trialExpiryDate;
-                return true;
-            }
-        }
-
-        function selectPlan(days, price) {
-            state.subscription.selectedPlan = { days, price };
-            document.getElementById('selectedPlanInfo').classList.remove('hidden');
-            document.getElementById('planDuration').textContent = days;
-            document.getElementById('planPrice').textContent = price;
-            document.getElementById('paymentBtn').disabled = false;
-            document.getElementById('paymentBtnText').textContent = `Payer ${price} USDT pour ${days} jours`;
-        }
-
-        async function processPayment() {
-            if (!state.subscription.selectedPlan) return;
-            
-            const { days, price } = state.subscription.selectedPlan;
-            const confirm = window.confirm(`Payer ${price} USDT pour ${days} jours ?`);
-            if (!confirm) return;
-            
-            try {
-                const signer = state.provider.getSigner();
-                const usdtContract = new ethers.Contract(
-                    USDT_CONTRACT,
-                    ERC20_ABI,
-                    signer
-                );
-                
-                const amount = ethers.utils.parseEther(price.toString());
-                const tx = await usdtContract.transfer(OWNER_WALLET, amount);
-                const receipt = await tx.wait();
-                
-                const expiryDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
-                localStorage.setItem(`subscription_${state.account.toLowerCase()}`, JSON.stringify({
-                    expiryDate: expiryDate.toISOString(),
-                    firstAccessDate: new Date().toISOString(),
-                    lastPayment: { date: new Date().toISOString(), amount: price, days: days, txHash: receipt.transactionHash }
-                }));
-                
-                state.subscription.isActive = true;
-                alert('✅ Paiement réussi !');
-                document.getElementById('subscriptionSection').classList.add('hidden');
-                document.getElementById('cryptoSelector').classList.remove('hidden');
-            } catch (error) {
-                console.error('❌ Erreur:', error);
-                alert('❌ Erreur: ' + error.message);
-            }
-        }
-
-        async function fetchCryptoList() {
-            document.getElementById('refreshIcon').classList.add('animate-spin');
-            const proxies = [
-                'https://corsproxy.io/?',
-                'https://api.codetabs.com/v1/proxy?quest=',
-                'https://api.allorigins.win/raw?url='
-            ];
-            
-            try {
-                let data = null;
-                for (const proxy of proxies) {
-                    try {
-                        const response = await fetch(proxy + encodeURIComponent('https://api.binance.com/api/v3/ticker/24hr'));
-                        if (response.ok) {
-                            data = await response.json();
-                            break;
-                        }
-                    } catch (e) { continue; }
-                }
-                
-                if (!data) {
-                    loadDefaultCryptoList();
-                    return;
-                }
-                
-                const binanceData = {};
-                data.forEach(item => {
-                    if (item.symbol.endsWith('USDT')) {
-                        binanceData[item.symbol] = {
-                            price: parseFloat(item.lastPrice),
-                            priceChange: parseFloat(item.priceChangePercent),
-                            volume: parseFloat(item.volume)
-                        };
-                    }
-                });
-                
-                state.cryptoList = Object.keys(TOKEN_ADDRESSES).map(symbol => ({
-                    symbol,
-                    name: symbol.replace('USDT', ''),
-                    price: binanceData[symbol]?.price || 0,
-                    priceChange: binanceData[symbol]?.priceChange || 0,
-                    volume: binanceData[symbol]?.volume || 0,
-                    realTradingAvailable: true
-                }));
-                
-                document.getElementById('cryptoSelect').innerHTML = state.cryptoList.map(c => 
-                    `<option value="${c.symbol}">${c.name} - ${c.price > 0 ? c.price.toFixed(c.price < 1 ? 6 : 2) : '...'} 🥞</option>`
-                ).join('');
-                
-                if (state.cryptoList.length > 0) {
-                    state.selectedCrypto = state.cryptoList[0].symbol;
-                    connectWebSocket();
-                }
-                
-                document.getElementById('cryptoCount').textContent = `(${state.cryptoList.length})`;
-                document.getElementById('apiStatus').innerHTML = '🟢 Synchronisé';
-                updateUI();
-            } catch (error) {
-                loadDefaultCryptoList();
-            } finally {
-                document.getElementById('refreshIcon').classList.remove('animate-spin');
-                document.getElementById('refreshText').textContent = 'Actualiser';
-            }
-        }
-        
-        function loadDefaultCryptoList() {
-            const defaultCryptos = [
-                { symbol: 'BTCUSDT', name: 'BTC', price: 95000, priceChange: 2.5 },
-                { symbol: 'ETHUSDT', name: 'ETH', price: 3400, priceChange: 1.8 },
-                { symbol: 'BNBUSDT', name: 'BNB', price: 650, priceChange: -0.5 },
-                { symbol: 'ADAUSDT', name: 'ADA', price: 1.1, priceChange: -1.2 },
-                { symbol: 'DOGEUSDT', name: 'DOGE', price: 0.42, priceChange: 8.5 },
-                { symbol: 'SOLUSDT', name: 'SOL', price: 240, priceChange: 3.2 },
-                { symbol: 'MATICUSDT', name: 'MATIC', price: 0.58, priceChange: 1.5 },
-                { symbol: 'LINKUSDT', name: 'LINK', price: 23.5, priceChange: 0.9 },
-                { symbol: 'AVAXUSDT', name: 'AVAX', price: 48.2, priceChange: 4.2 },
-                { symbol: 'LTCUSDT', name: 'LTC', price: 110, priceChange: 1.2 },
-                { symbol: 'CAKEUSDT', name: 'CAKE', price: 3.2, priceChange: 1.8 },
-                { symbol: 'UNIUSDT', name: 'UNI', price: 14.5, priceChange: 2.3 },
-                { symbol: 'ATOMUSDT', name: 'ATOM', price: 8.9, priceChange: 0.5 }
-            ];
-            
-            state.cryptoList = defaultCryptos.map(c => ({ ...c, volume: 1000000, realTradingAvailable: !!TOKEN_ADDRESSES[c.symbol] }));
-            document.getElementById('cryptoSelect').innerHTML = state.cryptoList.map(c => {
-                const priceDisplay = c.price >= 1000 ? (c.price / 1000).toFixed(1) + 'K' : c.price.toFixed(c.price < 1 ? 4 : 2);
-                return `<option value="${c.symbol}">${c.name} • ${priceDisplay} 🥞</option>`;
-            }).join('');
-            
-            if (state.cryptoList.length > 0) {
-                state.selectedCrypto = state.cryptoList[0].symbol;
-                connectWebSocket();
-            }
-            
-            document.getElementById('cryptoCount').textContent = `(${state.cryptoList.length})`;
-            document.getElementById('apiStatus').innerHTML = '🟢 Prêt';
-        }
-
-        function changeCrypto() {
-            state.selectedCrypto = document.getElementById('cryptoSelect').value;
-            state.priceHistory = [];
-            wsConnectionAttempts = 0;
-            if (priceSimulationInterval) {
-                clearInterval(priceSimulationInterval);
-                priceSimulationInterval = null;
-            }
-            document.getElementById('chartCrypto').textContent = state.selectedCrypto.replace('USDT', '');
-            const crypto = state.cryptoList.find(c => c.symbol === state.selectedCrypto);
-            if (crypto) state.currentPrice = crypto.price;
-            connectWebSocket();
-        }
-
-        function changeTradingMode() {
-            state.tradingMode = document.getElementById('tradingMode').value;
-            if (state.tradingMode === 'real') {
-                const confirm = window.confirm(
-                    '🥞 MODE RÉEL PANCAKESWAP ACTIVÉ\n\n' +
-                    '✅ PancakeSwap DEX leader BSC\n' +
-                    '⚠️ Risques: perte totale possible\n' +
-                    '💰 Slippage: 0.5-1% recommandé\n' +
-                    '💸 Montant minimum: 10 USDT\n\n' +
-                    'Confirmez ?'
-                );
-                if (!confirm) {
-                    document.getElementById('tradingMode').value = 'simulation';
-                    state.tradingMode = 'simulation';
-                }
-            }
-            updateUI();
-        }
-
-        function connectWebSocket() {
-            if (ws) {
-                try { ws.close(); } catch (e) {}
-            }
-            
-            if (wsConnectionAttempts >= MAX_WS_ATTEMPTS) {
-                startPriceSimulation();
-                return;
-            }
-            
-            try {
-                ws = new WebSocket(`wss://stream.binance.com:9443/ws/${state.selectedCrypto.toLowerCase()}@ticker`);
-                ws.onopen = () => {
-                    document.getElementById('apiStatus').innerHTML = '🟢 Prix temps réel';
-                    wsConnectionAttempts = 0;
-                    if (priceSimulationInterval) {
-                        clearInterval(priceSimulationInterval);
-                        priceSimulationInterval = null;
-                    }
-                };
-                ws.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    state.currentPrice = parseFloat(data.c);
-                    state.priceHistory.push(state.currentPrice);
-                    if (state.priceHistory.length > 100) state.priceHistory.shift();
-                    if (state.priceHistory.length % 10 === 0) {
-                        updateIndicators();
-                        updateChart();
-                    }
-                    document.getElementById('currentPrice').textContent = state.currentPrice.toFixed(2);
-                    document.getElementById('cryptoName').textContent = state.selectedCrypto.replace('USDT', '');
-                };
-                ws.onerror = () => {
-                    wsConnectionAttempts++;
-                    if (wsConnectionAttempts >= MAX_WS_ATTEMPTS) startPriceSimulation();
-                };
-                ws.onclose = () => {
-                    if (wsConnectionAttempts < MAX_WS_ATTEMPTS) {
-                        wsConnectionAttempts++;
-                        setTimeout(() => { if (state.selectedCrypto) connectWebSocket(); }, 2000);
-                    } else {
-                        startPriceSimulation();
-                    }
-                };
-            } catch (error) {
-                startPriceSimulation();
-            }
-        }
-        
-        function startPriceSimulation() {
-            if (priceSimulationInterval) clearInterval(priceSimulationInterval);
-            document.getElementById('apiStatus').innerHTML = '🟢 Simulation fluide';
-            const crypto = state.cryptoList.find(c => c.symbol === state.selectedCrypto);
-            if (crypto && !state.currentPrice) state.currentPrice = crypto.price;
-            if (!state.currentPrice) state.currentPrice = 1000;
-            
-            let tickCounter = 0;
-            priceSimulationInterval = setInterval(() => {
-                const variation = (Math.random() - 0.5) * 0.0006;
-                state.currentPrice = state.currentPrice * (1 + variation);
-                state.priceHistory.push(state.currentPrice);
-                if (state.priceHistory.length > 100) state.priceHistory.shift();
-                const decimals = state.currentPrice < 1 ? 6 : state.currentPrice < 100 ? 4 : 2;
-                document.getElementById('currentPrice').textContent = state.currentPrice.toFixed(decimals);
-                document.getElementById('cryptoName').textContent = state.selectedCrypto.replace('USDT', '');
-                tickCounter++;
-                if (tickCounter % 5 === 0) updateChart();
-                if (tickCounter % 20 === 0) updateIndicators();
-            }, 500);
-        }
-
-        function updateIndicators() {
-            if (state.priceHistory.length < 50) return;
-            state.indicators.rsi = calculateRSI(state.priceHistory);
-            state.indicators.macd = calculateMACD(state.priceHistory);
-        }
-
-        function calculateRSI(prices, period = 14) {
-            if (prices.length < period + 1) return 50;
-            let gains = 0, losses = 0;
-            for (let i = prices.length - period; i < prices.length; i++) {
-                const change = prices[i] - prices[i - 1];
-                if (change > 0) gains += change;
-                else losses += Math.abs(change);
-            }
-            const avgGain = gains / period;
-            const avgLoss = losses / period;
-            if (avgLoss === 0) return 100;
-            const rs = avgGain / avgLoss;
-            return 100 - (100 / (1 + rs));
-        }
-
-        function calculateMACD(prices) {
-            if (prices.length < 26) return { histogram: 0 };
-            const ema12 = prices.slice(-12).reduce((a, b) => a + b) / 12;
-            const ema26 = prices.slice(-26).reduce((a, b) => a + b) / 26;
-            return { histogram: ema12 - ema26 };
-        }
-
-        function setCapital() {
-            const capital = parseFloat(document.getElementById('capitalInput').value);
-            
-            if (!capital || capital <= 0) {
-                alert('❌ Montant invalide');
-                return;
-            }
-            
-            if (state.tradingMode === 'real' && capital > parseFloat(state.balanceUSDT)) {
-                alert('❌ Capital supérieur au solde USDT disponible');
-                return;
-            }
-            
-            if (state.tradingMode === 'real' && capital < 10) {
-                alert('⚠️ ATTENTION\n\nMontant minimum recommandé: 10 USDT\n\nEn dessous, PancakeSwap peut refuser la transaction.');
-                return;
-            }
-            
-            const privateKeyValue = document.getElementById('privateKeyInput').value.trim();
-            if (privateKeyValue) {
-                try {
-                    const wallet = new ethers.Wallet(privateKeyValue);
-                    const bscProvider = new ethers.providers.JsonRpcProvider(BSC_RPC);
-                    state.wallet = wallet.connect(bscProvider);
-                    state.privateKey = privateKeyValue;
-                    state.autoMode = true;
-                    console.log('🔐 Mode automatique:', wallet.address);
-                    alert(`✅ Trading automatique activé\n\nWallet: ${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`);
-                } catch (error) {
-                    alert('❌ Clé privée invalide: ' + error.message);
-                    return;
-                }
-            } else {
-                state.autoMode = false;
-            }
-            
-            state.tradingCapital = capital;
-            state.capitalSet = true;
-            updateUI();
-            alert(`✅ Capital défini: ${capital} USDT`);
-        }
-
-        function setMaxCapital() {
-            const balance = parseFloat(state.balanceUSDT);
-            if (balance > 0) {
-                document.getElementById('capitalInput').value = Math.floor(balance * 100) / 100;
-            }
-        }
-
-        function setHalfCapital() {
-            const balance = parseFloat(state.balanceUSDT);
-            if (balance > 0) {
-                document.getElementById('capitalInput').value = Math.floor(balance * 50) / 100;
-            }
-        }
-
-        async function syncWalletBalance() {
-            if (!state.isConnected && !state.wallet) {
-                alert('❌ Connectez votre wallet');
-                return;
-            }
-
-            try {
-                const address = state.wallet ? state.wallet.address : state.account;
-                const provider = state.wallet ? state.wallet.provider : state.provider;
-                
-                const bnbBalance = await provider.getBalance(address);
-                state.balanceBNB = ethers.utils.formatEther(bnbBalance);
-                
-                const usdtBalance = await getTokenBalance(USDT_CONTRACT, address);
-                state.balanceUSDT = ethers.utils.formatUnits(usdtBalance, 18);
-                
-                document.getElementById('availableBalance').textContent = parseFloat(state.balanceUSDT).toFixed(2);
-                document.getElementById('bnbBalance').textContent = parseFloat(state.balanceBNB).toFixed(4);
-                document.getElementById('usdtBalance').textContent = parseFloat(state.balanceUSDT).toFixed(2);
-                
-                alert(`✅ Soldes\n\nBNB: ${parseFloat(state.balanceBNB).toFixed(4)}\nUSDT: ${parseFloat(state.balanceUSDT).toFixed(2)}`);
-            } catch (error) {
-                alert('❌ Erreur: ' + error.message);
-            }
-        }
-
-        function updateTradeAmount() {
-            if (!state.capitalSet) return;
-            const percent = parseFloat(document.getElementById('tradePercent').value);
-            const amount = (state.tradingCapital * percent / 100).toFixed(2);
-            document.getElementById('tradeAmount').textContent = amount;
-        }
-
-        function toggleBot() {
-            if (!state.subscription.isActive) {
-                alert('❌ Abonnement requis');
-                document.getElementById('subscriptionSection').classList.remove('hidden');
-                return;
-            }
-            
-            if (!state.isConnected && !state.wallet) {
-                alert
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Token à trader</label>
+                    <select id="cryptoSelect" onchange="changeCrypto()" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-400">
+                        <option value="BTC">Bitcoin (BTC)</option>
+                        <option value="ETH">Ethereum (ETH)</option>
+                        <option value="BNB">BNB</option>
+                    </select>
+                </div>
