@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot Trading Multi-Crypto Pro</title>
+    <title>Bot Trading Multi-Crypto Pro - PancakeSwap</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -28,7 +28,7 @@
                 <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                     Bot Trading Multi-Crypto Pro
                 </h1>
-                <p class="text-gray-400 mt-2">Trading OpenOcean BSC • Meilleur prix agrégé • Automatique 24/7</p>
+                <p class="text-gray-400 mt-2">Trading PancakeSwap BSC • Meilleur DEX • Automatique 24/7</p>
             </div>
             
             <div class="flex gap-3">
@@ -134,14 +134,14 @@
                     <select id="cryptoSelect" onchange="changeCrypto()" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-400 text-lg font-semibold cursor-pointer">
                         <option>Chargement...</option>
                     </select>
-                    <p class="text-xs text-gray-400 mt-2">💎 = Trading réel OK • 🎮 = Simulation</p>
+                    <p class="text-xs text-gray-400 mt-2">🥞 = PancakeSwap OK • 🎮 = Simulation</p>
                 </div>
                 
                 <div>
                     <label class="block text-sm text-gray-400 mb-2">Mode de Trading</label>
                     <select id="tradingMode" onchange="changeTradingMode()" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-400 text-lg font-semibold cursor-pointer">
                         <option value="simulation">🎮 Simulation</option>
-                        <option value="real">🌊 Réel (OpenOcean)</option>
+                        <option value="real">🥞 Réel (PancakeSwap)</option>
                     </select>
                     <p class="text-xs text-gray-400 mt-2" id="modeInfo">⚠️ Activez uniquement si vous comprenez les risques</p>
                 </div>
@@ -279,8 +279,8 @@
                     
                     <div>
                         <label class="block text-sm text-gray-400 mb-2">Slippage (%)</label>
-                        <input type="number" id="slippage" value="2" step="0.1" min="0.5" max="10" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-400">
-                        <p class="text-xs text-gray-400 mt-1">⚠️ Recommandé: 2-3% • Si échec: augmenter à 5%</p>
+                        <input type="number" id="slippage" value="1" step="0.1" min="0.1" max="10" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-400">
+                        <p class="text-xs text-gray-400 mt-1">⚠️ PancakeSwap recommandé: 0.5-1%</p>
                     </div>
                 </div>
 
@@ -317,8 +317,8 @@
                             <p>• Risque de perte totale</p>
                             <p>• Frais gas BSC (~0.003-0.01 BNB)</p>
                             <p>• Minimum 0.02 BNB pour gas</p>
-                            <p>• Montant minimum: 20 USDT</p>
-                            <p>• Slippage recommandé: 2-3%</p>
+                            <p>• Montant minimum: 10 USDT</p>
+                            <p>• Slippage PancakeSwap: 0.5-1%</p>
                         </div>
                     </div>
                 </div>
@@ -342,12 +342,29 @@
     </div>
 
     <script>
-       // PancakeSwap BSC Configuration
+        // PancakeSwap BSC Configuration
         const PANCAKESWAP_ROUTER = '0x10ED43C718714eb63d5aA57B78B54704E256024E'; // PancakeSwap V2 Router
         const USDT_CONTRACT = '0x55d398326f99059fF775485246999027B3197955';
         const WBNB_CONTRACT = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c';
-        const BSC_RPC = 'https://bsc-dataseed1.binance.org';        
+        const BSC_RPC = 'https://bsc-dataseed1.binance.org';
         const TELEGRAM_GROUP = 'https://t.me/+votre_lien_telegram';
+        const FREE_TRIAL_DAYS = 2;
+        const OWNER_WALLET = '0xVotreAdresseIci'; // Remplacez par votre adresse
+
+        // ABI PancakeSwap Router
+        const PANCAKESWAP_ROUTER_ABI = [
+            'function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)',
+            'function getAmountsOut(uint amountIn, address[] memory path) public view returns (uint[] memory amounts)',
+            'function WETH() external pure returns (address)'
+        ];
+
+        const ERC20_ABI = [
+            'function approve(address spender, uint256 amount) public returns (bool)',
+            'function allowance(address owner, address spender) public view returns (uint256)',
+            'function balanceOf(address account) public view returns (uint256)',
+            'function decimals() public view returns (uint8)',
+            'function transfer(address to, uint256 amount) public returns (bool)'
+        ];
 
         let state = {
             account: null, 
@@ -444,7 +461,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            console.log('🚀 Bot de Trading Multi-Crypto Pro v2.1 - DEBUG');
+            console.log('🥞 Bot de Trading Multi-Crypto Pro v3.0 - PancakeSwap');
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
             console.log('');
             
@@ -517,7 +534,8 @@
                             grid: { color: 'rgba(75, 85, 99, 0.3)', drawBorder: false },
                             ticks: { 
                                 color: 'rgb(156, 163, 175)',
-                                callback: function(value) { return '$' + value.toFixed(2); }
+                                callback: function(value) { return '
+                 + value.toFixed(2); }
                             }
                         }
                     },
@@ -643,7 +661,7 @@
                 console.log('💰 BNB:', state.balanceBNB);
                 console.log('💵 USDT:', state.balanceUSDT);
                 
-                await checkSubscription();
+                checkSubscription();
                 updateUI();
                 
                 alert(`✅ Wallet connecté !\n\nBNB: ${parseFloat(state.balanceBNB).toFixed(4)}\nUSDT: ${parseFloat(state.balanceUSDT).toFixed(2)}`);
@@ -655,14 +673,6 @@
 
         function checkSubscription() {
             const walletLower = state.account.toLowerCase();
-            
-            if (walletLower === FREE_WALLET.toLowerCase()) {
-                state.subscription.isActive = true;
-                state.subscription.expiryDate = new Date(2099, 11, 31);
-                document.getElementById('subscriptionSection').classList.add('hidden');
-                document.getElementById('cryptoSelector').classList.remove('hidden');
-                return true;
-            }
             
             const savedSub = localStorage.getItem(`subscription_${walletLower}`);
             if (savedSub) {
@@ -727,7 +737,7 @@
                 const signer = state.provider.getSigner();
                 const usdtContract = new ethers.Contract(
                     USDT_CONTRACT,
-                    ['function transfer(address to, uint256 amount) returns (bool)'],
+                    ERC20_ABI,
                     signer
                 );
                 
@@ -798,7 +808,7 @@
                 }));
                 
                 document.getElementById('cryptoSelect').innerHTML = state.cryptoList.map(c => 
-                    `<option value="${c.symbol}">${c.name} - ${c.price > 0 ? c.price.toFixed(c.price < 1 ? 6 : 2) : '...'} 💎</option>`
+                    `<option value="${c.symbol}">${c.name} - ${c.price > 0 ? c.price.toFixed(c.price < 1 ? 6 : 2) : '...'} 🥞</option>`
                 ).join('');
                 
                 if (state.cryptoList.length > 0) {
@@ -837,7 +847,7 @@
             state.cryptoList = defaultCryptos.map(c => ({ ...c, volume: 1000000, realTradingAvailable: !!TOKEN_ADDRESSES[c.symbol] }));
             document.getElementById('cryptoSelect').innerHTML = state.cryptoList.map(c => {
                 const priceDisplay = c.price >= 1000 ? (c.price / 1000).toFixed(1) + 'K' : c.price.toFixed(c.price < 1 ? 4 : 2);
-                return `<option value="${c.symbol}">${c.name} • $${priceDisplay} 💎</option>`;
+                return `<option value="${c.symbol}">${c.name} • ${priceDisplay} 🥞</option>`;
             }).join('');
             
             if (state.cryptoList.length > 0) {
@@ -867,11 +877,11 @@
             state.tradingMode = document.getElementById('tradingMode').value;
             if (state.tradingMode === 'real') {
                 const confirm = window.confirm(
-                    '🌊 MODE RÉEL ACTIVÉ\n\n' +
-                    '✅ OpenOcean meilleur prix\n' +
+                    '🥞 MODE RÉEL PANCAKESWAP ACTIVÉ\n\n' +
+                    '✅ PancakeSwap DEX leader BSC\n' +
                     '⚠️ Risques: perte totale possible\n' +
-                    '💰 Slippage: 2-3% recommandé\n' +
-                    '💸 Montant minimum: 20 USDT\n\n' +
+                    '💰 Slippage: 0.5-1% recommandé\n' +
+                    '💸 Montant minimum: 10 USDT\n\n' +
                     'Confirmez ?'
                 );
                 if (!confirm) {
@@ -994,8 +1004,8 @@
                 return;
             }
             
-            if (state.tradingMode === 'real' && capital < 20) {
-                alert('⚠️ ATTENTION\n\nMontant minimum recommandé: 20 USDT\n\nEn dessous, OpenOcean peut refuser la transaction.');
+            if (state.tradingMode === 'real' && capital < 10) {
+                alert('⚠️ ATTENTION\n\nMontant minimum recommandé: 10 USDT\n\nEn dessous, PancakeSwap peut refuser la transaction.');
                 return;
             }
             
@@ -1078,609 +1088,4 @@
             }
             
             if (!state.isConnected && !state.wallet) {
-                alert('❌ Connectez votre wallet');
-                return;
-            }
-            
-            if (!state.capitalSet) {
-                alert('❌ Définissez le capital');
-                return;
-            }
-            
-            state.botRunning = !state.botRunning;
-            
-            if (state.botRunning) {
-                startBot();
-                alert(`✅ Bot démarré\n\nMode: ${state.tradingMode === 'real' ? 'RÉEL' : 'SIMULATION'}`);
-            } else {
-                stopBot();
-            }
-            
-            updateUI();
-        }
-
-        function startBot() {
-            const strategy = strategies[state.selectedStrategy];
-            console.log(`\n🚀 BOT DÉMARRÉ - ${strategy.name}`);
-            
-            let logCounter = 0;
-            botInterval = setInterval(() => {
-                if (state.priceHistory.length < 50) return;
-                
-                const now = Date.now();
-                const timeRemaining = strategy.minTradeInterval - (now - lastTradeTime);
-                
-                if (timeRemaining > 0) {
-                    if (logCounter % 10 === 0) {
-                        console.log(`⏰ Cooldown: ${Math.ceil(timeRemaining / 1000)}s | RSI: ${state.indicators.rsi.toFixed(1)}`);
-                    }
-                    logCounter++;
-                    return;
-                }
-                
-                const signal = getTradeSignal();
-                if (signal.signal && signal.confidence > 0.65) {
-                    console.log(`\n🎯 SIGNAL: ${signal.signal}`);
-                    executeTrade(signal.signal, signal.confidence);
-                    logCounter = 0;
-                }
-            }, 5000);
-        }
-
-        function stopBot() {
-            if (botInterval) {
-                clearInterval(botInterval);
-                botInterval = null;
-                console.log(`\n🛑 BOT ARRÊTÉ - Profit: ${state.portfolio.profit.toFixed(2)} USDT`);
-            }
-        }
-
-        function getTradeSignal() {
-            const { rsi, macd } = state.indicators;
-            const strategy = strategies[state.selectedStrategy];
-            
-            if (!state.currentPosition) {
-                const timeSinceLastSell = Date.now() - state.lastSellTime;
-                if (state.lastSellTime > 0 && timeSinceLastSell < POST_SELL_COOLDOWN) {
-                    return { signal: null, confidence: 0 };
-                }
-                
-                if (rsi < strategy.rsiBuyThreshold && macd.histogram > 0) {
-                    return { signal: 'BUY', confidence: 0.85 };
-                }
-                if (rsi < strategy.rsiBuyStrong) {
-                    return { signal: 'BUY', confidence: 0.9 };
-                }
-                return { signal: null, confidence: 0 };
-            } else {
-                const profitPercent = ((state.currentPrice - state.lastBuyPrice) / state.lastBuyPrice) * 100;
-                if (profitPercent <= strategy.stopLoss) return { signal: 'SELL', confidence: 0.9 };
-                if (profitPercent >= strategy.takeProfit) return { signal: 'SELL', confidence: 0.95 };
-                return { signal: null, confidence: 0 };
-            }
-        }
-
-        async function executeTrade(tradeType, confidence) {
-            const percent = parseFloat(document.getElementById('tradePercent').value);
-            const tradeAmountUSDT = (state.tradingCapital * percent) / 100;
-            
-            console.log(`\n📊 ${tradeType} - ${tradeAmountUSDT.toFixed(2)} USDT - Prix: ${state.currentPrice.toFixed(6)}`);
-            
-            let txHash = null;
-            let executionPrice = state.currentPrice;
-            
-            if (state.tradingMode === 'real' && (state.isConnected || state.wallet)) {
-                try {
-                    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-                    console.log('🔄 TRANSACTION RÉELLE EN COURS');
-                    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-                    
-                    const address = state.wallet ? state.wallet.address : state.account;
-                    const provider = state.wallet ? state.wallet.provider : state.provider;
-                    const bnbBalance = await provider.getBalance(address);
-                    const minBNB = ethers.utils.parseEther('0.02');
-                    
-                    console.log('💰 Solde BNB:', ethers.utils.formatEther(bnbBalance), 'BNB');
-                    
-                    if (bnbBalance.lt(minBNB)) {
-                        throw new Error(`BNB insuffisant. Minimum: 0.02 BNB. Votre solde: ${ethers.utils.formatEther(bnbBalance)} BNB`);
-                    }
-                    
-                    if (tradeAmountUSDT < 20) {
-                        throw new Error('Montant minimum: 20 USDT. OpenOcean refuse les montants trop faibles.');
-                    }
-                    
-                    txHash = await executeRealTrade(tradeType, tradeAmountUSDT);
-                    
-                    console.log('✅ Transaction réussie:', txHash);
-                    console.log('🔗 BSCScan: https://bscscan.com/tx/' + txHash);
-                    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-                    
-                    executionPrice = state.currentPrice;
-                } catch (error) {
-                    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-                    console.error('❌ ERREUR TRANSACTION');
-                    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-                    console.error('Détails:', error);
-                    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-                    
-                    let errorMsg = '❌ Échec du trade:\n\n';
-                    
-                    if (error.message.includes('insufficient funds')) {
-                        errorMsg += '💰 Fonds insuffisants\n\nVérifiez vos soldes BNB et USDT';
-                    } else if (error.message.includes('user rejected') || error.message.includes('denied')) {
-                        errorMsg += '🚫 Transaction refusée\n\nVous avez annulé la transaction dans MetaMask';
-                    } else if (error.message.includes('BNB insuffisant')) {
-                        errorMsg += error.message;
-                    } else if (error.message.includes('Montant minimum')) {
-                        errorMsg += error.message;
-                    } else if (error.message.includes('Slippage')) {
-                        errorMsg += '⚠️ Slippage trop faible\n\nAugmentez le slippage à 3-5%';
-                    } else if (error.message.includes('liquidity')) {
-                        errorMsg += '💧 Liquidité insuffisante\n\nEssayez:\n• Un montant plus petit\n• Un autre token\n• Augmenter le slippage';
-                    } else {
-                        errorMsg += error.message;
-                    }
-                    
-                    alert(errorMsg);
-                    return;
-                }
-            } else {
-                executionPrice = state.currentPrice * (1 + (Math.random() * 0.01 - 0.005));
-                console.log('🎮 Simulation');
-            }
-            
-            let profitPercent = 0;
-            let netProfitUSDT = 0;
-            
-            if (tradeType === 'BUY') {
-                if (!state.currentPosition) {
-                    state.currentPosition = 'BUY';
-                    state.lastBuyPrice = executionPrice;
-                    state.positionAmount = tradeAmountUSDT;
-                    console.log('📈 POSITION OUVERTE');
-                } else {
-                    const totalAmount = state.positionAmount + tradeAmountUSDT;
-                    state.lastBuyPrice = ((state.lastBuyPrice * state.positionAmount) + (executionPrice * tradeAmountUSDT)) / totalAmount;
-                    state.positionAmount = totalAmount;
-                    console.log('📈 POSITION AUGMENTÉE');
-                }
-            } else {
-                if (!state.currentPosition) {
-                    console.error('❌ Pas de position à vendre');
-                    return;
-                }
-                
-                profitPercent = ((executionPrice - state.lastBuyPrice) / state.lastBuyPrice) * 100;
-                netProfitUSDT = state.positionAmount * (profitPercent / 100);
-                
-                console.log(`📉 POSITION FERMÉE - ${netProfitUSDT >= 0 ? 'PROFIT' : 'PERTE'}: ${netProfitUSDT >= 0 ? '+' : ''}${netProfitUSDT.toFixed(4)} USDT (${profitPercent >= 0 ? '+' : ''}${profitPercent.toFixed(2)}%)`);
-                
-                state.lastSellTime = Date.now();
-                state.currentPosition = null;
-                state.lastBuyPrice = 0;
-                state.positionAmount = 0;
-            }
-            
-            const newTrade = {
-                id: Date.now(),
-                time: new Date().toLocaleTimeString('fr-FR'),
-                date: new Date().toLocaleDateString('fr-FR'),
-                pair: state.selectedCrypto,
-                type: tradeType,
-                amount: tradeAmountUSDT.toFixed(2),
-                entryPrice: executionPrice.toFixed(6),
-                profit: netProfitUSDT.toFixed(4),
-                profitPercent: profitPercent.toFixed(2),
-                mode: txHash ? 'real' : state.tradingMode,
-                txHash: txHash,
-                strategy: strategies[state.selectedStrategy].name,
-                autoMode: state.autoMode,
-                rsi: state.indicators.rsi.toFixed(1),
-                macd: state.indicators.macd.histogram.toFixed(4)
-            };
-            
-            state.trades.unshift(newTrade);
-            state.trades = state.trades.slice(0, 50);
-            
-            if (tradeType === 'SELL') {
-                state.portfolio.profit += netProfitUSDT;
-                state.portfolio.profitPercent = ((state.portfolio.profit / state.tradingCapital) * 100).toFixed(2);
-            }
-            
-            lastTradeTime = Date.now();
-            renderTrades();
-            updateChart();
-            updateUI();
-        }
-
-        async function executeRealTrade(tradeType, amountUSDT) {
-            const tokenAddress = TOKEN_ADDRESSES[state.selectedCrypto];
-            
-            if (!tokenAddress) {
-                throw new Error('Token non supporté pour trading réel');
-            }
-            
-            let signer, tradingAddress;
-            
-            if (state.wallet) {
-                signer = state.wallet;
-                tradingAddress = state.wallet.address;
-                console.log('🔐 Wallet automatique');
-            } else if (state.provider) {
-                signer = state.provider.getSigner();
-                tradingAddress = state.account;
-                console.log('📱 MetaMask');
-            } else {
-                throw new Error('Aucun signer disponible');
-            }
-            
-            const gasPrice = await signer.provider.getGasPrice();
-            const gasPriceWithBuffer = gasPrice.mul(130).div(100); // +30% buffer
-            
-            console.log('⛽ Gas:', ethers.utils.formatUnits(gasPriceWithBuffer, 'gwei'), 'Gwei');
-            
-            const slippage = parseFloat(document.getElementById('slippage').value);
-            console.log('📊 Slippage:', slippage, '%');
-            
-            if (slippage < 1) {
-                throw new Error('Slippage trop faible. Minimum recommandé: 2%');
-            }
-            
-            const bnbBalance = await signer.provider.getBalance(tradingAddress);
-            const minBNBRequired = ethers.utils.parseEther('0.02');
-            
-            if (bnbBalance.lt(minBNBRequired)) {
-                throw new Error(`BNB insuffisant. Requis: 0.02 BNB, disponible: ${ethers.utils.formatEther(bnbBalance)} BNB`);
-            }
-            
-            if (tradeType === 'BUY') {
-                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-                console.log('🟢 ACHAT: USDT → Token');
-                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-                
-                const usdtContract = new ethers.Contract(
-                    USDT_CONTRACT,
-                    [
-                        'function allowance(address owner, address spender) view returns (uint256)',
-                        'function approve(address spender, uint256 amount) returns (bool)',
-                        'function balanceOf(address account) view returns (uint256)'
-                    ],
-                    signer
-                );
-                
-                const amountInWei = ethers.utils.parseEther(amountUSDT.toString());
-                const usdtBalance = await usdtContract.balanceOf(tradingAddress);
-                
-                console.log('💵 Solde USDT:', ethers.utils.formatUnits(usdtBalance, 18));
-                
-                if (usdtBalance.lt(amountInWei)) {
-                    throw new Error(`USDT insuffisant. Requis: ${amountUSDT}, disponible: ${ethers.utils.formatUnits(usdtBalance, 18)}`);
-                }
-                
-                console.log('📝 Vérification allowance...');
-                const allowance = await usdtContract.allowance(tradingAddress, OPENOCEAN_EXCHANGE);
-                
-                if (allowance.lt(amountInWei)) {
-                    console.log('🔓 Approbation USDT...');
-                    const approveTx = await usdtContract.approve(
-                        OPENOCEAN_EXCHANGE,
-                        ethers.constants.MaxUint256,
-                        { gasLimit: 100000, gasPrice: gasPriceWithBuffer }
-                    );
-                    console.log('⏳ TX approve:', approveTx.hash);
-                    await approveTx.wait(1);
-                    console.log('✅ USDT approuvé');
-                } else {
-                    console.log('✅ USDT déjà approuvé');
-                }
-                
-                console.log('🌊 Appel API OpenOcean...');
-                console.log('   IN:', USDT_CONTRACT);
-                console.log('   OUT:', tokenAddress);
-                console.log('   Amount:', amountUSDT, 'USDT');
-                
-                const quoteUrl = `${OPENOCEAN_API}/quote`;
-                const quoteParams = new URLSearchParams({
-                    inTokenAddress: USDT_CONTRACT,
-                    outTokenAddress: tokenAddress,
-                    amount: amountInWei.toString(),
-                    gasPrice: gasPriceWithBuffer.toString(),
-                    slippage: slippage.toString(),
-                    account: tradingAddress
-                });
-                
-                console.log('📡 URL:', quoteUrl + '?' + quoteParams.toString());
-                
-                let quoteData;
-                try {
-                    const quoteResponse = await fetch(`${quoteUrl}?${quoteParams}`);
-                    quoteData = await quoteResponse.json();
-                    
-                    console.log('📥 Réponse API:', JSON.stringify(quoteData, null, 2));
-                    
-                    if (quoteData.code !== 200) {
-                        throw new Error(`API OpenOcean erreur ${quoteData.code}: ${quoteData.message || 'Erreur inconnue'}`);
-                    }
-                    
-                    console.log('💱 Route:', quoteData.data.dexes?.join(', ') || 'Multiple DEX');
-                    console.log('💰 Montant estimé:', ethers.utils.formatUnits(quoteData.data.outAmount, 18));
-                } catch (error) {
-                    console.error('❌ Erreur API Quote:', error);
-                    throw new Error(`Impossible d'obtenir le prix: ${error.message}`);
-                }
-                
-                console.log('🔄 Préparation transaction swap...');
-                const swapUrl = `${OPENOCEAN_API}/swap_quote`;
-                const swapParams = new URLSearchParams({
-                    inTokenAddress: USDT_CONTRACT,
-                    outTokenAddress: tokenAddress,
-                    amount: amountInWei.toString(),
-                    gasPrice: gasPriceWithBuffer.toString(),
-                    slippage: slippage.toString(),
-                    account: tradingAddress
-                });
-                
-                let swapData;
-                try {
-                    const swapResponse = await fetch(`${swapUrl}?${swapParams}`);
-                    swapData = await swapResponse.json();
-                    
-                    console.log('📥 Réponse Swap:', JSON.stringify(swapData, null, 2));
-                    
-                    if (swapData.code !== 200) {
-                        throw new Error(`API Swap erreur ${swapData.code}: ${swapData.message || 'Erreur inconnue'}`);
-                    }
-                } catch (error) {
-                    console.error('❌ Erreur API Swap:', error);
-                    throw new Error(`Impossible de préparer le swap: ${error.message}`);
-                }
-                
-                console.log('💫 Envoi transaction...');
-                console.log('   To:', swapData.data.to);
-                console.log('   Gas Limit:', Math.floor(swapData.data.estimatedGas * 1.5));
-                
-                const swapTx = await signer.sendTransaction({
-                    to: swapData.data.to,
-                    data: swapData.data.data,
-                    value: swapData.data.value || '0',
-                    gasLimit: Math.floor(swapData.data.estimatedGas * 1.5),
-                    gasPrice: gasPriceWithBuffer
-                });
-                
-                console.log('⏳ TX envoyée:', swapTx.hash);
-                const receipt = await swapTx.wait(1);
-                console.log('✅ Confirmée - Block:', receipt.blockNumber);
-                
-                return swapTx.hash;
-                
-            } else {
-                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-                console.log('🔴 VENTE: Token → USDT');
-                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-                
-                const tokenContract = new ethers.Contract(
-                    tokenAddress,
-                    [
-                        'function balanceOf(address account) view returns (uint256)',
-                        'function allowance(address owner, address spender) view returns (uint256)',
-                        'function approve(address spender, uint256 amount) returns (bool)',
-                        'function decimals() view returns (uint8)'
-                    ],
-                    signer
-                );
-                
-                let decimals = 18;
-                try {
-                    decimals = await tokenContract.decimals();
-                    console.log('📊 Decimals:', decimals);
-                } catch (e) {
-                    console.log('⚠️ Decimals défaut: 18');
-                }
-                
-                const tokenBalance = await tokenContract.balanceOf(tradingAddress);
-                
-                if (tokenBalance.isZero()) {
-                    throw new Error('❌ Aucun token à vendre. Vous devez d\'abord ACHETER.');
-                }
-                
-                console.log('💎 Balance token:', ethers.utils.formatUnits(tokenBalance, decimals));
-                
-                const allowance = await tokenContract.allowance(tradingAddress, OPENOCEAN_EXCHANGE);
-                
-                if (allowance.lt(tokenBalance)) {
-                    console.log('🔓 Approbation token...');
-                    const approveTx = await tokenContract.approve(
-                        OPENOCEAN_EXCHANGE,
-                        ethers.constants.MaxUint256,
-                        { gasLimit: 100000, gasPrice: gasPriceWithBuffer }
-                    );
-                    console.log('⏳ TX approve:', approveTx.hash);
-                    await approveTx.wait(1);
-                    console.log('✅ Token approuvé');
-                }
-                
-                console.log('🌊 Appel API OpenOcean (vente)...');
-                
-                const quoteUrl = `${OPENOCEAN_API}/quote`;
-                const quoteParams = new URLSearchParams({
-                    inTokenAddress: tokenAddress,
-                    outTokenAddress: USDT_CONTRACT,
-                    amount: tokenBalance.toString(),
-                    gasPrice: gasPriceWithBuffer.toString(),
-                    slippage: slippage.toString(),
-                    account: tradingAddress
-                });
-                
-                let quoteData;
-                try {
-                    const quoteResponse = await fetch(`${quoteUrl}?${quoteParams}`);
-                    quoteData = await quoteResponse.json();
-                    
-                    console.log('📥 Réponse:', JSON.stringify(quoteData, null, 2));
-                    
-                    if (quoteData.code !== 200) {
-                        throw new Error(`API erreur: ${quoteData.message || 'Erreur'}`);
-                    }
-                    
-                    console.log('💱 Route:', quoteData.data.dexes?.join(', ') || 'Multiple');
-                    console.log('💵 USDT estimé:', ethers.utils.formatUnits(quoteData.data.outAmount, 18));
-                } catch (error) {
-                    throw new Error(`Quote erreur: ${error.message}`);
-                }
-                
-                const swapUrl = `${OPENOCEAN_API}/swap_quote`;
-                const swapParams = new URLSearchParams({
-                    inTokenAddress: tokenAddress,
-                    outTokenAddress: USDT_CONTRACT,
-                    amount: tokenBalance.toString(),
-                    gasPrice: gasPriceWithBuffer.toString(),
-                    slippage: slippage.toString(),
-                    account: tradingAddress
-                });
-                
-                let swapData;
-                try {
-                    const swapResponse = await fetch(`${swapUrl}?${swapParams}`);
-                    swapData = await swapResponse.json();
-                    
-                    if (swapData.code !== 200) {
-                        throw new Error(`Swap erreur: ${swapData.message || 'Erreur'}`);
-                    }
-                } catch (error) {
-                    throw new Error(`Swap erreur: ${error.message}`);
-                }
-                
-                console.log('💫 Envoi vente...');
-                const swapTx = await signer.sendTransaction({
-                    to: swapData.data.to,
-                    data: swapData.data.data,
-                    value: swapData.data.value || '0',
-                    gasLimit: Math.floor(swapData.data.estimatedGas * 1.5),
-                    gasPrice: gasPriceWithBuffer
-                });
-                
-                console.log('⏳ TX:', swapTx.hash);
-                const receipt = await swapTx.wait(1);
-                console.log('✅ Confirmée - Block:', receipt.blockNumber);
-                
-                return swapTx.hash;
-            }
-        }
-
-        async function getTokenBalance(tokenAddress, walletAddress) {
-            if (!state.provider && !state.wallet) return ethers.BigNumber.from(0);
-            
-            try {
-                const provider = state.wallet ? state.wallet.provider : state.provider;
-                const contract = new ethers.Contract(
-                    tokenAddress,
-                    ['function balanceOf(address account) view returns (uint256)'],
-                    provider
-                );
-                return await contract.balanceOf(walletAddress);
-            } catch (error) {
-                return ethers.BigNumber.from(0);
-            }
-        }
-
-        function renderTrades() {
-            if (state.trades.length === 0) return;
-            
-            document.getElementById('tradesContainer').innerHTML = state.trades.map(t => `
-                <div class="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg mb-2 border-l-4 ${t.type === 'BUY' ? 'border-green-400' : 'border-red-400'}">
-                    <div class="flex items-center gap-4">
-                        <span class="${t.type === 'BUY' ? 'text-green-400' : 'text-red-400'} text-3xl">
-                            ${t.type === 'BUY' ? '🟢' : '🔴'}
-                        </span>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <p class="font-bold text-lg">${t.type === 'BUY' ? 'ACHAT' : 'VENTE'}</p>
-                                <p class="font-semibold">${t.pair.replace('USDT', '')}/USDT</p>
-                                ${t.mode === 'real' ? '<span class="text-xs bg-blue-400/20 text-blue-400 px-2 py-0.5 rounded font-bold">🌊 OPENOCEAN</span>' : '<span class="text-xs bg-blue-400/20 text-blue-400 px-2 py-0.5 rounded">SIM</span>'}
-                                ${t.autoMode ? '<span class="text-xs bg-purple-400/20 text-purple-400 px-2 py-0.5 rounded">AUTO</span>' : ''}
-                            </div>
-                            <p class="text-xs text-gray-400 mt-1">${t.date} - ${t.time} • ${t.strategy} • ${t.amount} USDT</p>
-                            <p class="text-xs text-gray-500">RSI: ${t.rsi} • MACD: ${t.macd}</p>
-                            ${t.txHash ? `<a href="https://bscscan.com/tx/${t.txHash}" target="_blank" class="text-xs text-purple-400 hover:underline mt-1 inline-block">📋 BSCScan ↗</a>` : ''}
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-mono">${t.entryPrice}</p>
-                        ${t.type === 'SELL' ? `
-                            <p class="text-lg font-bold ${parseFloat(t.profit) >= 0 ? 'text-green-400' : 'text-red-400'}">
-                                ${parseFloat(t.profit) >= 0 ? '+' : ''}${t.profit} USDT
-                            </p>
-                            <p class="text-sm font-semibold ${parseFloat(t.profitPercent) >= 0 ? 'text-green-400' : 'text-red-400'}">
-                                ${parseFloat(t.profitPercent) >= 0 ? '+' : ''}${t.profitPercent}%
-                            </p>
-                        ` : '<p class="text-sm text-gray-400">Position ouverte</p>'}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateUI() {
-            if (state.isConnected) {
-                document.getElementById('connectBtn').className = 'flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all bg-green-600 hover:bg-green-700';
-                document.getElementById('walletText').textContent = `${state.account.slice(0, 6)}...${state.account.slice(-4)}`;
-                document.getElementById('walletStatus').innerHTML = '🟢 Connecté';
-                document.getElementById('cryptoSelector').classList.remove('hidden');
-                document.getElementById('privateKeySection').classList.remove('hidden');
-                document.getElementById('capitalSection').classList.remove('hidden');
-                document.getElementById('bnbBalance').textContent = parseFloat(state.balanceBNB).toFixed(4);
-                document.getElementById('usdtBalance').textContent = parseFloat(state.balanceUSDT).toFixed(2);
-                document.getElementById('availableBalance').textContent = parseFloat(state.balanceUSDT).toFixed(2);
-            }
-            
-            if (state.capitalSet) {
-                document.getElementById('capitalSection').classList.add('hidden');
-                document.getElementById('statsCards').classList.remove('hidden');
-                document.getElementById('capitalDisplay').textContent = state.tradingCapital.toFixed(2);
-                updateTradeAmount();
-                document.getElementById('toggleBotBtn').disabled = false;
-                document.getElementById('toggleBotBtn').className = state.botRunning ? 
-                    'flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-all bg-red-600 hover:bg-red-700' :
-                    'flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-all bg-green-600 hover:bg-green-700';
-            }
-            
-            if (state.tradingMode === 'real') {
-                document.getElementById('modeInfo').textContent = '🌊 Trades réels via OpenOcean';
-                document.getElementById('modeDisplay').innerHTML = '🌊 OPENOCEAN';
-                document.getElementById('modeDisplay').className = 'text-xl font-bold mt-1 text-blue-400';
-            } else {
-                document.getElementById('modeInfo').textContent = '✅ Aucun risque';
-                document.getElementById('modeDisplay').innerHTML = '🎮 SIM';
-                document.getElementById('modeDisplay').className = 'text-xl font-bold mt-1 text-blue-400';
-            }
-            
-            if (state.botRunning) {
-                document.getElementById('botIcon').textContent = '⏸️';
-                document.getElementById('botText').textContent = 'Arrêter';
-            } else {
-                document.getElementById('botIcon').textContent = '▶️';
-                document.getElementById('botText').textContent = 'Démarrer';
-            }
-            
-            if (state.autoMode) {
-                document.getElementById('tradingTypeStatus').innerHTML = '🤖 Automatique 24/7';
-            } else if (state.isConnected) {
-                document.getElementById('tradingTypeStatus').innerHTML = '📱 Manuel MetaMask';
-            } else {
-                document.getElementById('tradingTypeStatus').innerHTML = '🟡 Non configuré';
-            }
-            
-            if (state.currentPosition) {
-                const profitPercent = ((state.currentPrice - state.lastBuyPrice) / state.lastBuyPrice) * 100;
-                document.getElementById('positionStatus').innerHTML = `🟢 Long ${profitPercent >= 0 ? '+' : ''}${profitPercent.toFixed(2)}%`;
-                document.getElementById('positionStatus').className = profitPercent >= 0 ? 'text-green-400 font-bold' : 'text-red-400 font-bold';
-            } else {
-                document.getElementById('positionStatus').innerHTML = '⚪ Aucune';
-                document.getElementById('positionStatus').className = 'text-gray-400';
-            }
-            
-            document.getElementById('profitDisplay').textContent = state.portfolio.profit.toFixed(2);
-        }
-    </script>
-</body>
-</html>
+                alert
