@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Trading Multi-Crypto Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #0f172a, #581c87, #0f172a);
+            min-height: 100vh;
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="text-white p-4 md:p-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                    Bot Trading Multi-Crypto Pro
+                </h1>
+                <p class="text-gray-400 mt-2">Trading OpenOcean BSC • Meilleur prix agrégé • Automatique 24/7</p>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="openTelegramChat()" class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 rounded-lg font-semibold transition-all">
+                    <span>💬</span>
+                    Communauté
+                    <span>↗</span>
+                </button>
+                
+                <button onclick="openDCASwap()" class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-lg font-semibold transition-all">
+                    <span>🔄</span>
+                    DCA/Swap
+                    <span>↗</span>
+                </button>
+                
+                <button onclick="connectWallet()" id="connectBtn" class="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600">
+                    <span>👛</span>
+                    <span id="walletText">Connecter MetaMask</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="subscriptionSection" class="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-500 rounded-xl p-6 mb-6 hidden">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span>💎</span>
+                Abonnement Bot Trading Pro
+            </h3>
+            
+            <div id="freeTrialInfo" class="bg-green-500/20 border border-green-500 rounded-lg p-4 mb-4">
+                <p class="text-green-300 font-bold mb-2">🎁 OFFRE DE LANCEMENT</p>
+                <p class="text-sm text-green-200">
+                    ✅ 2 jours GRATUITS pour tester le bot<br>
+                    ✅ Toutes les fonctionnalités incluses<br>
+                    ✅ Trading réel + Simulation<br>
+                    <span id="trialDaysRemaining" class="font-bold text-green-400"></span>
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div class="bg-slate-700/50 border-2 border-slate-600 rounded-lg p-4 hover:border-purple-400 transition-all cursor-pointer" onclick="selectPlan(1, 1)">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-purple-400">1 USDT</p>
+                        <p class="text-sm text-gray-400 mt-1">1 jour</p>
+                        <p class="text-xs text-gray-500 mt-2">Essai simple</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-700/50 border-2 border-purple-500 rounded-lg p-4 hover:border-purple-400 transition-all cursor-pointer relative" onclick="selectPlan(7, 6)">
+                    <div class="absolute -top-3 -right-3 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full">
+                        -14%
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-purple-400">6 USDT</p>
+                        <p class="text-sm text-gray-400 mt-1">7 jours</p>
+                        <p class="text-xs text-gray-500 mt-2">0.86 USDT/jour</p>
+                        <p class="text-xs text-green-400 mt-1">⭐ Populaire</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-700/50 border-2 border-yellow-500 rounded-lg p-4 hover:border-purple-400 transition-all cursor-pointer relative" onclick="selectPlan(30, 20)">
+                    <div class="absolute -top-3 -right-3 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full">
+                        -33%
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-yellow-400">20 USDT</p>
+                        <p class="text-sm text-gray-400 mt-1">30 jours</p>
+                        <p class="text-xs text-gray-500 mt-2">0.67 USDT/jour</p>
+                        <p class="text-xs text-yellow-400 mt-1">🏆 Meilleure valeur</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="selectedPlanInfo" class="bg-blue-500/20 border border-blue-500 rounded-lg p-4 mb-4 hidden">
+                <p class="text-blue-300 font-bold mb-2">📋 Forfait sélectionné</p>
+                <p class="text-sm text-blue-200">
+                    <span id="planDuration"></span> jours pour <span id="planPrice"></span> USDT
+                </p>
+            </div>
+
+            <button onclick="processPayment()" id="paymentBtn" class="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <span>💳</span>
+                <span id="paymentBtnText">Sélectionnez un forfait</span>
+            </button>
+
+            <div class="mt-4 p-3 bg-slate-700/50 rounded-lg">
+                <p class="text-xs text-gray-400 text-center">
+                    🔒 Paiement sécurisé via BSC • Pas de données bancaires requises
+                </p>
+            </div>
+        </div>
+
+        <div id="cryptoSelector" class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 mb-6 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Sélectionner la Crypto</h3>
+                <button onclick="fetchCryptoList()" id="refreshBtn" class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-all">
+                    <span id="refreshIcon">🔄</span>
+                    <span id="refreshText">Actualiser</span>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Cryptomonnaie <span id="cryptoCount"></span></label>
+                    <select id="cryptoSelect" onchange="changeCrypto()" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-400 text-lg font-semibold cursor-pointer">
+                        <option>Chargement...</option>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-2">💎 = Trading réel OK • 🎮 = Simulation</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Mode de Trading</label>
+                    <select id="tradingMode" onchange="changeTradingMode()" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-400 text-lg font-semibold cursor-pointer">
+                        <option value="simulation">🎮 Simulation</option>
+                        <option value="real">🌊 Réel (OpenOcean)</option>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-2" id="modeInfo">⚠️ Activez uniquement si vous comprenez les risques</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="privateKeySection" class="bg-gradient-to-r from-red-500/20 to-orange-500/20 border-2 border-red-500 rounded-xl p-6 mb-6 hidden">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span>🔐</span>
+                Trading Automatique 24/7 (Optionnel)
+            </h3>
+            
+            <div class="bg-red-900/30 border border-red-500 rounded-lg p-4 mb-4">
+                <p class="text-red-300 font-bold mb-2">⚠️ AVERTISSEMENTS CRITIQUES</p>
+                <ul class="text-sm text-red-200 space-y-1">
+                    <li>• Utilisez UNIQUEMENT un wallet dédié avec petit capital</li>
+                    <li>• Votre clé privée ne sera JAMAIS sauvegardée</li>
+                    <li>• Stockée uniquement en mémoire pendant la session</li>
+                    <li>• Effacée automatiquement à la fermeture de l'onglet</li>
+                    <li>• Laissez vide pour utiliser MetaMask (manuel)</li>
+                </ul>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Clé Privée (pour trading automatique sans confirmation)</label>
+                    <input type="password" id="privateKeyInput" placeholder="0x... ou laisser vide pour MetaMask" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-red-400">
+                    <p class="text-xs text-gray-400 mt-1">
+                        <span class="text-yellow-400">⚡</span> Vide = Mode manuel (MetaMask) | Rempli = Mode automatique 24/7
+                    </p>
+                </div>
+                
+                <button onclick="togglePrivateKeyVisibility()" class="text-sm text-blue-400 hover:underline">
+                    👁️ Afficher/Masquer la clé
+                </button>
+            </div>
+        </div>
+
+        <div id="capitalSection" class="bg-gradient-to-r from-yellow-400/20 to-orange-500/20 border-2 border-yellow-400 rounded-xl p-6 mb-6 hidden">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span>🎯</span>
+                Capital de trading en USDT
+            </h3>
+            <p class="text-gray-300 mb-4">
+                Montant en USDT pour le trading automatique
+                <br />
+                <span class="text-sm text-gray-400">Solde disponible: <span id="availableBalance" class="font-bold text-green-400">0</span> USDT</span>
+            </p>
+            <div class="flex gap-4 mb-3">
+                <input type="number" id="capitalInput" placeholder="Ex: 50" step="10" class="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-400">
+                <button onclick="setCapital()" class="px-8 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 rounded-lg font-semibold transition-all">
+                    Valider
+                </button>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="setMaxCapital()" class="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition-all">
+                    💯 Utiliser 100%
+                </button>
+                <button onclick="setHalfCapital()" class="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition-all">
+                    ➗ Utiliser 50%
+                </button>
+                <button onclick="syncWalletBalance()" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition-all">
+                    🔄 Actualiser
+                </button>
+            </div>
+        </div>
+
+        <div id="statsCards" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 hidden">
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
+                <p class="text-gray-400 text-xs">Capital</p>
+                <p class="text-xl font-bold mt-1 text-green-400">$<span id="capitalDisplay">0</span></p>
+            </div>
+            
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
+                <p class="text-gray-400 text-xs">Prix <span id="cryptoName">BTC</span></p>
+                <p class="text-xl font-bold mt-1">$<span id="currentPrice">...</span></p>
+            </div>
+            
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
+                <p class="text-gray-400 text-xs">Profit</p>
+                <p class="text-xl font-bold mt-1 text-green-400">$<span id="profitDisplay">0.00</span></p>
+            </div>
+            
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4">
+                <p class="text-gray-400 text-xs">Mode</p>
+                <p class="text-xl font-bold mt-1" id="modeDisplay">🎮 SIM</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold">📈 Graphique de Trading</h2>
+                        <div class="text-sm text-gray-400">
+                            <span id="chartCrypto">BTC</span>/USDT
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="tradingChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+                    <h2 class="text-2xl font-bold mb-4">Stratégies</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="strategiesGrid"></div>
+                </div>
+
+                <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-bold">Historique des Trades</h2>
+                        <button onclick="toggleBot()" id="toggleBotBtn" disabled class="flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-all bg-gray-600 cursor-not-allowed">
+                            <span id="botIcon">▶️</span>
+                            <span id="botText">Démarrer</span>
+                        </button>
+                    </div>
+                    <div id="tradesContainer">
+                        <div class="text-center py-8 text-gray-400">
+                            <span class="text-4xl">⚠️</span>
+                            <p>Aucun trade</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+                <h2 class="text-2xl font-bold mb-4">Paramètres</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">% par trade</label>
+                        <input type="number" id="tradePercent" value="10" min="1" max="100" onchange="updateTradeAmount()" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-400">
+                        <p class="text-xs text-gray-400 mt-1">Montant: $<span id="tradeAmount">0</span></p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Slippage (%)</label>
+                        <input type="number" id="slippage" value="1" step="0.1" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-400">
+                        <p class="text-xs text-gray-400 mt-1">⚠️ Recommandé: 1-2% pour tokens volatils</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-green-400/10 border border-green-400/30 rounded-lg">
+                    <div class="flex gap-2">
+                        <span class="text-green-400">💰</span>
+                        <div class="text-sm text-gray-300">
+                            <p class="font-semibold text-green-400">Soldes</p>
+                            <p>BNB: <span id="bnbBalance">0</span></p>
+                            <p>USDT: $<span id="usdtBalance">0</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-4 bg-blue-400/10 border border-blue-400/30 rounded-lg">
+                    <div class="flex gap-2">
+                        <span class="text-blue-400">📊</span>
+                        <div class="text-sm text-gray-300">
+                            <p class="font-semibold text-blue-400">Statut</p>
+                            <p>Wallet: <span id="walletStatus">🔴 Non connecté</span></p>
+                            <p>Mode: <span id="tradingTypeStatus">🟡 ...</span></p>
+                            <p>Position: <span id="positionStatus">⚪ Aucune</span></p>
+                            <p>Binance: <span id="apiStatus">🟡 ...</span></p>
+                            <p>Ethers: <span id="ethersStatus">🟡 ...</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-4 bg-red-400/10 border border-red-400/30 rounded-lg">
+                    <div class="flex gap-2">
+                        <span class="text-red-400">⚠️</span>
+                        <div class="text-xs text-gray-300">
+                            <p class="font-semibold text-red-400">ATTENTION</p>
+                            <p>• Risque de perte totale</p>
+                            <p>• Frais gas BSC (~0.003-0.01 BNB)</p>
+                            <p>• Minimum 0.02 BNB pour gas</p>
+                            <p>• Commencez petit (10-50$)</p>
+                            <p>• OpenOcean = Prix optimal</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-4 bg-blue-400/10 border border-blue-400/30 rounded-lg">
+                    <div class="flex gap-2">
+                        <span class="text-blue-400">💬</span>
+                        <div class="text-sm text-gray-300">
+                            <p class="font-semibold text-blue-400">Communauté</p>
+                            <button onclick="openTelegramChat()" class="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-sm font-semibold transition-all">
+                                <span>📱</span>
+                                Rejoindre Telegram
+                                <span>↗</span>
+                            </button>
+                            <p class="text-xs text-gray-400 mt-2">Échangez avec la communauté, partagez vos stratégies et suivez les signaux</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // OpenOcean BSC Configuration
+        const OPENOCEAN_EXCHANGE = '0x6352a56caadC4F1E25CD6c75970Fa768A3304e64'; // OpenOcean Exchange BSC
+        const OPENOCEAN_API = 'https://open-api.openocean.finance/v3/56'; // BSC = chain 56
+        const USDT_CONTRACT = '0x55d398326f99059fF775485246999027B3197955';
+        const BSC_RPC = 'https://bsc-dataseed1.binance.org';
+        
+        const OWNER_WALLET = '0x5959f13ad996ab184780a778cf6d594786f44250';
+        const FREE_WALLET = '0xb44dd82c004a767d23b890f788fd6f9b13fcf6a4';
+        const FREE_TRIAL_DAYS = 2;
+        
+        const TELEGRAM_GROUP = 'https://t.me/+votre_lien_telegram';
+        const TELEGRAM_BOT_TOKEN = 'VOTRE_BOT_TOKEN';
+        const TELEGRAM_CHAT_ID = 'VOTRE_CHAT_ID';
+
+        let state = {
+            account: null, 
+            isConnected: false, 
+            balanceBNB: '0', 
+            balanceUSDT: '0',
+            selectedCrypto: 'BTCUSDT', 
+            cryptoList: [], 
+            currentPrice: null, 
+            priceHistory: [],
+            tradingCapital: 0, 
+            capitalSet: false, 
+            tradingMode: 'simulation',
+            botRunning: false, 
+            trades: [], 
+            portfolio: { profit: 0, profitPercent: 0 },
+            indicators: { rsi: 50, macd: { histogram: 0 }, ema20: 0, ema50: 0 },
+            selectedStrategy: 'scalping', 
+            provider: null,
+            privateKey: null,
+            wallet: null,
+            autoMode: false,
+            currentPosition: null,
+            lastBuyPrice: 0,
+            positionAmount: 0,
+            lastSellTime: 0,
+            chartData: { labels: [], prices: [], buyPoints: [], sellPoints: [] },
+            subscription: {
+                isActive: false,
+                expiryDate: null,
+                firstAccessDate: null,
+                selectedPlan: null
+            }
+        };
+
+        let ws = null, botInterval = null, lastTradeTime = 0;
+        let tradingChart = null;
+        let priceSimulationInterval = null;
+        let wsConnectionAttempts = 0;
+        const MAX_WS_ATTEMPTS = 3;
+
+        const POST_SELL_COOLDOWN = 120000;
+
+        const TOKEN_ADDRESSES = {
+            'BTCUSDT': '0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c',  // BTCB - Très liquide
+            'ETHUSDT': '0x2170Ed0880ac9A755fd29B2688956BD959F933F8',  // ETH - Très liquide
+            'BNBUSDT': '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',  // WBNB - Très liquide
+            'ADAUSDT': '0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47',  // ADA - Liquide
+            'DOGEUSDT': '0xbA2aE424d960c26247Dd6c32edC70B295c744C43', // DOGE - Très liquide
+            'SOLUSDT': '0x570A5D26f7765Ecb712C0924E4De545B89fD43dF',  // SOL - Liquide
+            'MATICUSDT': '0xCC42724C6683B7E57334c4E856f4c9965ED682bD', // MATIC - Très liquide
+            'LINKUSDT': '0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD', // LINK - Liquide
+            'AVAXUSDT': '0x1CE0c2827e2eF14D5C4f29a091d735A204794041', // AVAX - Liquide
+            'LTCUSDT': '0x4338665CBB7B2485A8855A139b75D5e34AB0DB94',  // LTC - Liquide
+            'CAKEUSDT': '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82', // CAKE - Très liquide PancakeSwap
+            'UNIUSDT': '0xBf5140A22578168FD562DCcF235E5D43A02ce9B1',  // UNI - Liquide
+            'ATOMUSDT': '0x0Eb3a705fc54725037CC9e008bDede697f62F335'  // ATOM - Liquide
+        };
+
+        const strategies = {
+            scalping: { 
+                name: 'Scalping', 
+                description: 'Rapide RSI+MACD', 
+                minTradeInterval: 180000,
+                rsiBuyThreshold: 40,
+                rsiBuyStrong: 30,
+                rsiSellThreshold: 60,
+                rsiSellStrong: 70,
+                takeProfit: 1.5,
+                stopLoss: -2.0
+            },
+            swing: { 
+                name: 'Swing', 
+                description: 'Positions EMA', 
+                minTradeInterval: 900000,
+                rsiBuyThreshold: 35,
+                rsiBuyStrong: 25,
+                rsiSellThreshold: 70,
+                rsiSellStrong: 75,
+                takeProfit: 1.5,
+                stopLoss: -2.0
+            },
+            arbitrage: { 
+                name: 'Arbitrage', 
+                description: 'Diff prix', 
+                minTradeInterval: 60000,
+                rsiBuyThreshold: 45,
+                rsiBuyStrong: 35,
+                rsiSellThreshold: 55,
+                rsiSellStrong: 65,
+                takeProfit: 1.5,
+                stopLoss: -2.0
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('🚀 Bot de Trading Multi-Crypto Pro v2.0');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('');
+            
+            if (typeof ethers !== 'undefined') {
+                document.getElementById('ethersStatus').innerHTML = '🟢 v' + ethers.version;
+                console.log('✅ Ethers.js v' + ethers.version + ' - Prêt pour BSC');
+            } else {
+                document.getElementById('ethersStatus').innerHTML = '🔴 Erreur';
+                console.error('❌ Ethers.js non chargé');
+            }
+            
+            initChart();
+            renderStrategies();
+            
+            console.log('📊 Chargement des cryptos haute liquidité...');
+            loadDefaultCryptoList();
+            
+            console.log('');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('✅ Bot prêt - OpenOcean Edition !');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('');
+            console.log('🌊 Intégration OpenOcean:');
+            console.log('   • Meilleur prix agrégé automatique');
+            console.log('   • Routes multi-DEX optimisées');
+            console.log('   • PancakeSwap + Biswap + MDEX + Autres');
+            console.log('   • Slippage minimisé');
+            console.log('   • SANS COMMISSION !');
+            console.log('');
+            console.log('💎 Fonctionnalités:');
+            console.log('   • 13 cryptos ULTRA liquides');
+            console.log('   • 0% taxe de transfert garantie');
+            console.log('   • Graphique FLUIDE (500ms)');
+            console.log('   • Trading réel optimisé BSC');
+            console.log('   • 3 stratégies perfectionnées');
+            console.log('   • Frais uniquement: Gas BSC');
+            console.log('');
+            console.log('🎯 Connectez MetaMask pour commencer !');
+            console.log('');
+            
+            // Tenter la synchronisation API en arrière-plan (silencieux)
+            setTimeout(() => {
+                fetchCryptoList().catch(() => {
+                    // Mode simulation déjà actif
+                });
+            }, 2000);
+        });
+
+        function initChart() {
+            const ctx = document.getElementById('tradingChart').getContext('2d');
+            tradingChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Prix',
+                        data: [],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        pointRadius: 0,
+                        borderWidth: 2,
+                        fill: true
+                    }, {
+                        label: 'Achats',
+                        data: [],
+                        backgroundColor: 'rgb(34, 197, 94)',
+                        pointRadius: 8,
+                        pointStyle: 'triangle',
+                        showLine: false,
+                        pointRotation: 0
+                    }, {
+                        label: 'Ventes',
+                        data: [],
+                        backgroundColor: 'rgb(239, 68, 68)',
+                        pointRadius: 8,
+                        pointStyle: 'triangle',
+                        showLine: false,
+                        pointRotation: 180
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 500,
+                        easing: 'easeInOutQuart'
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: { color: 'rgb(156, 163, 175)' }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            enabled: true
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: { 
+                                color: 'rgba(75, 85, 99, 0.3)',
+                                drawBorder: false
+                            },
+                            ticks: { 
+                                color: 'rgb(156, 163, 175)', 
+                                maxTicksLimit: 10,
+                                maxRotation: 0
+                            }
+                        },
+                        y: {
+                            display: true,
+                            grid: { 
+                                color: 'rgba(75, 85, 99, 0.3)',
+                                drawBorder: false
+                            },
+                            ticks: { 
+                                color: 'rgb(156, 163, 175)',
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            if (!tradingChart || state.priceHistory.length === 0) return;
+            
+            const maxPoints = 50;
+            const prices = state.priceHistory.slice(-maxPoints);
+            const labels = prices.map((_, i) => {
+                const date = new Date(Date.now() - (maxPoints - i) * 500);
+                return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            });
+            
+            const buyPoints = new Array(prices.length).fill(null);
+            const sellPoints = new Array(prices.length).fill(null);
+            
+            state.trades.slice(0, 10).forEach(trade => {
+                const tradePrice = parseFloat(trade.entryPrice);
+                const closestIndex = prices.length - Math.floor(Math.random() * 5) - 1;
+                if (closestIndex >= 0 && closestIndex < prices.length) {
+                    if (trade.type === 'BUY') {
+                        buyPoints[closestIndex] = tradePrice;
+                    } else {
+                        sellPoints[closestIndex] = tradePrice;
+                    }
+                }
+            });
+            
+            tradingChart.data.labels = labels;
+            tradingChart.data.datasets[0].data = prices;
+            tradingChart.data.datasets[1].data = buyPoints;
+            tradingChart.data.datasets[2].data = sellPoints;
+            
+            tradingChart.update('active');
+        }
+
+        function renderStrategies() {
+            document.getElementById('strategiesGrid').innerHTML = Object.entries(strategies).map(([key, s]) => {
+                const intervalMinutes = s.minTradeInterval / 60000;
+                const intervalDisplay = intervalMinutes >= 1 
+                    ? `${intervalMinutes} min` 
+                    : `${s.minTradeInterval / 1000}s`;
+                
+                return `
+                <div onclick="selectStrategy('${key}')" class="p-4 rounded-lg border-2 ${state.selectedStrategy === key ? 'border-yellow-400 bg-yellow-400/10' : 'border-slate-600'} cursor-pointer hover:border-yellow-400/50 transition-all">
+                    <h3 class="font-bold mb-2">${s.name}</h3>
+                    <p class="text-gray-400 text-sm mb-2">${s.description}</p>
+                    <div class="text-xs text-gray-500 space-y-0.5">
+                        <p>📊 Achat: RSI &lt; ${s.rsiBuyThreshold}</p>
+                        <p>🎯 TP: +${s.takeProfit}% | SL: ${s.stopLoss}%</p>
+                        <p>⏱️ Cooldown: ${intervalDisplay}</p>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function selectStrategy(key) {
+            const oldStrategy = state.selectedStrategy;
+            state.selectedStrategy = key;
+            renderStrategies();
+            
+            const newStrategy = strategies[key];
+            const intervalDisplay = newStrategy.minTradeInterval >= 60000 
+                ? `${newStrategy.minTradeInterval / 60000} min` 
+                : `${newStrategy.minTradeInterval / 1000}s`;
+            
+            console.log(`\n📋 CHANGEMENT DE STRATÉGIE`);
+            console.log(`❌ Ancienne: ${strategies[oldStrategy].name}`);
+            console.log(`✅ Nouvelle: ${newStrategy.name}`);
+            console.log(`   • Achat: RSI < ${newStrategy.rsiBuyThreshold}`);
+            console.log(`   • Take Profit: +${newStrategy.takeProfit}%`);
+            console.log(`   • Stop Loss: ${newStrategy.stopLoss}%`);
+            console.log(`   • Cooldown: ${intervalDisplay}\n`);
+        }
+
+        function openDCASwap() {
+            window.open('https://reboot-20.vercel.app/', '_blank');
+        }
+        
+        function openTelegramChat() {
+            window.open(TELEGRAM_GROUP, '_blank');
+            console.log('💬 Ouverture du chat communautaire Telegram');
+        }
+
+        function togglePrivateKeyVisibility() {
+            const input = document.getElementById('privateKeyInput');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        async function connectWallet() {
+            if (!window.ethereum) {
+                alert('❌ MetaMask non installé\n\nVeuillez installer MetaMask pour continuer:\nhttps://metamask.io/download/');
+                window.open('https://metamask.io/download/', '_blank');
+                return;
+            }
+
+            try {
+                console.log('🔄 Connexion à MetaMask...');
+                
+                const accounts = await window.ethereum.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+                
+                console.log('✅ Comptes récupérés:', accounts);
+                
+                if (!accounts || accounts.length === 0) {
+                    throw new Error('Aucun compte disponible');
+                }
+                
+                const chainId = await window.ethereum.request({ 
+                    method: 'eth_chainId' 
+                });
+                
+                console.log('🔗 Chain ID actuel:', chainId);
+                
+                if (chainId !== '0x38') {
+                    console.log('⚠️ Pas sur BSC, changement de réseau...');
+                    
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x38' }]
+                        });
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            console.log('➕ Ajout du réseau BSC...');
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x38',
+                                    chainName: 'BNB Smart Chain',
+                                    nativeCurrency: { 
+                                        name: 'BNB', 
+                                        symbol: 'BNB', 
+                                        decimals: 18 
+                                    },
+                                    rpcUrls: ['https://bsc-dataseed1.binance.org'],
+                                    blockExplorerUrls: ['https://bscscan.com']
+                                }]
+                            });
+                        } else {
+                            throw switchError;
+                        }
+                    }
+                }
+                
+                state.account = accounts[0];
+                state.provider = new ethers.providers.Web3Provider(window.ethereum);
+                
+                console.log('💼 Wallet connecté:', state.account);
+                
+                console.log('💰 Récupération des soldes...');
+                const bnbBalance = await state.provider.getBalance(state.account);
+                state.balanceBNB = ethers.utils.formatEther(bnbBalance);
+                
+                const usdtBalance = await getTokenBalance(USDT_CONTRACT, state.account);
+                state.balanceUSDT = ethers.utils.formatUnits(usdtBalance, 18);
+                
+                state.isConnected = true;
+                
+                console.log('✅ Wallet connecté avec succès!');
+                console.log('💰 BNB:', state.balanceBNB);
+                console.log('💵 USDT:', state.balanceUSDT);
+                
+                const usdtAmount = parseFloat(state.balanceUSDT);
+                if (usdtAmount > 0) {
+                    document.getElementById('capitalInput').value = Math.floor(usdtAmount);
+                    console.log('💡 Capital suggéré:', Math.floor(usdtAmount), 'USDT');
+                }
+                
+                await checkSubscription();
+                
+                updateUI();
+                
+                alert(`✅ Wallet connecté !\n\n` +
+                      `Adresse: ${state.account.slice(0, 8)}...${state.account.slice(-6)}\n` +
+                      `BNB: ${parseFloat(state.balanceBNB).toFixed(4)}\n` +
+                      `USDT: ${parseFloat(state.balanceUSDT).toFixed(2)}`);
+                
+            } catch (error) {
+                console.error('❌ Erreur connexion wallet:', error);
+                
+                let errorMessage = 'Erreur de connexion: ';
+                
+                if (error.code === 4001) {
+                    errorMessage = 'Connexion refusée par l\'utilisateur';
+                } else if (error.code === -32002) {
+                    errorMessage = 'Une demande de connexion est déjà en cours.\nVeuillez vérifier MetaMask.';
+                } else if (error.message) {
+                    errorMessage += error.message;
+                } else {
+                    errorMessage += 'Erreur inconnue';
+                }
+                
+                alert('❌ ' + errorMessage + '\n\nAssurez-vous que:\n• MetaMask est installé\n• Vous avez déverrouillé MetaMask\n• Vous acceptez la connexion');
+            }
+        }
+
+        function checkSubscription() {
+            const walletLower = state.account.toLowerCase();
+            
+            if (walletLower === FREE_WALLET.toLowerCase()) {
+                state.subscription.isActive = true;
+                state.subscription.expiryDate = new Date(2099, 11, 31);
+                console.log('👑 Accès VIP gratuit activé');
+                document.getElementById('subscriptionSection').classList.add('hidden');
+                document.getElementById('cryptoSelector').classList.remove('hidden');
+                return true;
+            }
+            
+            const savedSub = localStorage.getItem(`subscription_${walletLower}`);
+            
+            if (savedSub) {
+                const subData = JSON.parse(savedSub);
+                const expiryDate = new Date(subData.expiryDate);
+                const now = new Date();
+                
+                if (now < expiryDate) {
+                    state.subscription.isActive = true;
+                    state.subscription.expiryDate = expiryDate;
+                    state.subscription.firstAccessDate = new Date(subData.firstAccessDate);
+                    
+                    const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+                    console.log(`✅ Abonnement actif - ${daysLeft} jours restants`);
+                    
+                    document.getElementById('subscriptionSection').classList.add('hidden');
+                    document.getElementById('cryptoSelector').classList.remove('hidden');
+                    return true;
+                } else {
+                    console.log('⚠️ Abonnement expiré');
+                }
+            }
+            
+            const firstAccess = localStorage.getItem(`first_access_${walletLower}`);
+            
+            if (!firstAccess) {
+                const now = new Date();
+                const expiryDate = new Date(now.getTime() + FREE_TRIAL_DAYS * 24 * 60 * 60 * 1000);
+                
+                localStorage.setItem(`first_access_${walletLower}`, now.toISOString());
+                localStorage.setItem(`subscription_${walletLower}`, JSON.stringify({
+                    expiryDate: expiryDate.toISOString(),
+                    firstAccessDate: now.toISOString(),
+                    isTrial: true
+                }));
+                
+                state.subscription.isActive = true;
+                state.subscription.expiryDate = expiryDate;
+                state.subscription.firstAccessDate = now;
+                
+                console.log(`🎁 Période d'essai gratuite activée - ${FREE_TRIAL_DAYS} jours`);
+                document.getElementById('trialDaysRemaining').textContent = `⏰ Il vous reste ${FREE_TRIAL_DAYS} jours d'essai gratuit`;
+                document.getElementById('subscriptionSection').classList.remove('hidden');
+                
+                setTimeout(() => {
+                    document.getElementById('subscriptionSection').classList.add('hidden');
+                    document.getElementById('cryptoSelector').classList.remove('hidden');
+                }, 5000);
+                
+                return true;
+            } else {
+                const firstAccessDate = new Date(firstAccess);
+                const now = new Date();
+                const trialExpiryDate = new Date(firstAccessDate.getTime() + FREE_TRIAL_DAYS * 24 * 60 * 60 * 1000);
+                
+                if (now >= trialExpiryDate) {
+                    console.log('❌ Période d\'essai expirée - Paiement requis');
+                    document.getElementById('subscriptionSection').classList.remove('hidden');
+                    document.getElementById('freeTrialInfo').innerHTML = `
+                        <p class="text-red-300 font-bold mb-2">⏰ PÉRIODE D'ESSAI EXPIRÉE</p>
+                        <p class="text-sm text-red-200">
+                            Votre essai gratuit de ${FREE_TRIAL_DAYS} jours est terminé.<br>
+                            Choisissez un forfait pour continuer à utiliser le bot.
+                        </p>
+                    `;
+                    document.getElementById('freeTrialInfo').className = 'bg-red-500/20 border border-red-500 rounded-lg p-4 mb-4';
+                    return false;
+                } else {
+                    const daysLeft = Math.ceil((trialExpiryDate - now) / (1000 * 60 * 60 * 24));
+                    console.log(`🎁 Essai gratuit - ${daysLeft} jours restants`);
+                    document.getElementById('trialDaysRemaining').textContent = `⏰ Il vous reste ${daysLeft} jour${daysLeft > 1 ? 's' : ''} d'essai gratuit`;
+                    
+                    state.subscription.isActive = true;
+                    state.subscription.expiryDate = trialExpiryDate;
+                    
+                    document.getElementById('subscriptionSection').classList.remove('hidden');
+                    setTimeout(() => {
+                        document.getElementById('subscriptionSection').classList.add('hidden');
+                        document.getElementById('cryptoSelector').classList.remove('hidden');
+                    }, 3000);
+                    
+                    return true;
+                }
+            }
+        }
+
+        function selectPlan(days, price) {
+            state.subscription.selectedPlan = { days, price };
+            
+            document.getElementById('selectedPlanInfo').classList.remove('hidden');
+            document.getElementById('planDuration').textContent = days;
+            document.getElementById('planPrice').textContent = price;
+            document.getElementById('paymentBtn').disabled = false;
+            document.getElementById('paymentBtnText').textContent = `Payer ${price} USDT pour ${days} jours`;
+            
+            console.log(`📋 Forfait sélectionné: ${days} jours pour ${price} USDT`);
+        }
+
+        async function processPayment() {
+            if (!state.subscription.selectedPlan) {
+                alert('❌ Veuillez sélectionner un forfait');
+                return;
+            }
+            
+            const { days, price } = state.subscription.selectedPlan;
+            
+            const confirm = window.confirm(
+                `💳 CONFIRMATION DE PAIEMENT\n\n` +
+                `Forfait: ${days} jours\n` +
+                `Prix: ${price} USDT\n` +
+                `Destinataire: ${OWNER_WALLET.slice(0, 8)}...${OWNER_WALLET.slice(-6)}\n\n` +
+                `Confirmez-vous ce paiement ?`
+            );
+            
+            if (!confirm) return;
+            
+            try {
+                console.log('💳 Traitement du paiement...');
+                document.getElementById('paymentBtnText').textContent = 'Traitement en cours...';
+                document.getElementById('paymentBtn').disabled = true;
+                
+                const signer = state.provider.getSigner();
+                const usdtContract = new ethers.Contract(
+                    USDT_CONTRACT,
+                    [
+                        'function transfer(address to, uint256 amount) returns (bool)',
+                        'function allowance(address owner, address spender) view returns (uint256)',
+                        'function approve(address spender, uint256 amount) returns (bool)'
+                    ],
+                    signer
+                );
+                
+                const amount = ethers.utils.parseEther(price.toString());
+                
+                console.log('💰 Envoi de', price, 'USDT à', OWNER_WALLET);
+                
+                const tx = await usdtContract.transfer(OWNER_WALLET, amount);
+                console.log('⏳ Transaction envoyée:', tx.hash);
+                
+                const receipt = await tx.wait();
+                console.log('✅ Transaction confirmée:', receipt.transactionHash);
+                
+                const now = new Date();
+                const expiryDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+                
+                const walletLower = state.account.toLowerCase();
+                localStorage.setItem(`subscription_${walletLower}`, JSON.stringify({
+                    expiryDate: expiryDate.toISOString(),
+                    firstAccessDate: now.toISOString(),
+                    lastPayment: {
+                        date: now.toISOString(),
+                        amount: price,
+                        days: days,
+                        txHash: receipt.transactionHash
+                    }
+                }));
+                
+                state.subscription.isActive = true;
+                state.subscription.expiryDate = expiryDate;
+                
+                alert(
+                    `✅ PAIEMENT RÉUSSI !\n\n` +
+                    `Transaction: ${receipt.transactionHash}\n` +
+                    `Abonnement activé pour ${days} jours\n` +
+                    `Expire le: ${expiryDate.toLocaleDateString('fr-FR')}\n\n` +
+                    `Bon trading ! 🚀`
+                );
+                
+                document.getElementById('subscriptionSection').classList.add('hidden');
+                document.getElementById('cryptoSelector').classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('❌ Erreur paiement:', error);
+                alert('❌ Erreur lors du paiement: ' + error.message);
+                document.getElementById('paymentBtnText').textContent = `Payer ${price} USDT pour ${days} jours`;
+                document.getElementById('paymentBtn').disabled = false;
+            }
+        }
+
+        async function fetchCryptoList() {
+            document.getElementById('refreshIcon').classList.add('animate-spin');
+            document.getElementById('refreshText').textContent = 'Chargement...';
+            
+            const proxies = [
+                'https://corsproxy.io/?',
+                'https://api.codetabs.com/v1/proxy?quest=',
+                'https://api.allorigins.win/raw?url='
+            ];
+            
+            const binanceUrl = 'https://api.binance.com/api/v3/ticker/24hr';
+            
+            try {
+                let data = null;
+                let proxySuccess = false;
+                
+                for (const proxy of proxies) {
+                    try {
+                        console.log(`📡 Tentative de synchronisation avec API...`);
+                        const response = await fetch(proxy + encodeURIComponent(binanceUrl), {
+                            method: 'GET',
+                            headers: { 'Accept': 'application/json' },
+                            timeout: 5000
+                        });
+                        
+                        if (response.ok) {
+                            data = await response.json();
+                            console.log('✅ API synchronisée avec succès');
+                            proxySuccess = true;
+                            break;
+                        }
+                    } catch (proxyError) {
+                        continue;
+                    }
+                }
+                
+                if (!data || !Array.isArray(data)) {
+                    console.log('📋 Mode offline activé - Prix temps réel via WebSocket');
+                    loadDefaultCryptoList();
+                    return;
+                }
+                
+                const binanceData = {};
+                data.forEach(item => {
+                    if (item.symbol.endsWith('USDT')) {
+                        binanceData[item.symbol] = {
+                            price: parseFloat(item.lastPrice),
+                            priceChange: parseFloat(item.priceChangePercent),
+                            volume: parseFloat(item.volume)
+                        };
+                    }
+                });
+                
+                state.cryptoList = [];
+                
+                Object.keys(TOKEN_ADDRESSES).forEach(symbol => {
+                    const binanceInfo = binanceData[symbol];
+                    state.cryptoList.push({
+                        symbol: symbol,
+                        name: symbol.replace('USDT', ''),
+                        price: binanceInfo ? binanceInfo.price : 0,
+                        priceChange: binanceInfo ? binanceInfo.priceChange : 0,
+                        volume: binanceInfo ? binanceInfo.volume : 0,
+                        realTradingAvailable: true
+                    });
+                });
+                
+                const additionalCryptos = data
+                    .filter(item => {
+                        return item.symbol.endsWith('USDT') && 
+                               !TOKEN_ADDRESSES[item.symbol] && 
+                               parseFloat(item.volume) > 50000000;
+                    })
+                    .sort((a, b) => parseFloat(b.volume) - parseFloat(a.volume))
+                    .slice(0, 10)
+                    .map(item => ({
+                        symbol: item.symbol,
+                        name: item.symbol.replace('USDT', ''),
+                        price: parseFloat(item.lastPrice),
+                        priceChange: parseFloat(item.priceChangePercent),
+                        volume: parseFloat(item.volume),
+                        realTradingAvailable: false
+                    }));
+                
+                state.cryptoList = [...state.cryptoList, ...additionalCryptos];
+                
+                state.cryptoList.sort((a, b) => {
+                    if (a.realTradingAvailable && !b.realTradingAvailable) return -1;
+                    if (!a.realTradingAvailable && b.realTradingAvailable) return 1;
+                    return b.volume - a.volume;
+                });
+                
+                document.getElementById('cryptoSelect').innerHTML = state.cryptoList.map(c => 
+                    `<option value="${c.symbol}">${c.name} - ${c.price > 0 ? c.price.toFixed(c.price < 1 ? 6 : 2) : '...'} ${c.realTradingAvailable ? '💎' : '🎮'}</option>`
+                ).join('');
+                
+                if (state.cryptoList.length > 0) {
+                    state.selectedCrypto = state.cryptoList[0].symbol;
+                    connectWebSocket();
+                }
+                
+                document.getElementById('cryptoCount').textContent = `(${state.cryptoList.length})`;
+                document.getElementById('apiStatus').innerHTML = '🟢 Synchronisé';
+                document.getElementById('refreshText').textContent = 'Actualiser';
+                updateUI();
+                
+                console.log(`✅ ${state.cryptoList.length} cryptos synchronisées`);
+                
+            } catch (error) {
+                console.log('📋 Mode offline - Prix temps réel actifs');
+                document.getElementById('apiStatus').innerHTML = '🟢 Temps réel';
+                document.getElementById('refreshText').textContent = 'Actualiser';
+                
+                if (state.cryptoList.length === 0) {
+                    loadDefaultCryptoList();
+                }
+            } finally {
+                document.getElementById('refreshIcon').classList.remove('animate-spin');
+            }
+        }
+        
+        function loadDefaultCryptoList() {
+            const defaultCryptos = [
+                { symbol: 'BTCUSDT', name: 'BTC', price: 95000, priceChange: 2.5 },
+                { symbol: 'ETHUSDT', name: 'ETH', price: 3400, priceChange: 1.8 },
+                { symbol: 'BNBUSDT', name: 'BNB', price: 650, priceChange: -0.5 },
+                { symbol: 'ADAUSDT', name: 'ADA', price: 1.1, priceChange: -1.2 },
+                { symbol: 'DOGEUSDT', name: 'DOGE', price: 0.42, priceChange: 8.5 },
+                { symbol: 'SOLUSDT', name: 'SOL', price: 240, priceChange: 3.2 },
+                { symbol: 'MATICUSDT', name: 'MATIC', price: 0.58, priceChange: 1.5 },
+                { symbol: 'LINKUSDT', name: 'LINK', price: 23.5, priceChange: 0.9 },
+                { symbol: 'AVAXUSDT', name: 'AVAX', price: 48.2, priceChange: 4.2 },
+                { symbol: 'LTCUSDT', name: 'LTC', price: 110, priceChange: 1.2 },
+                { symbol: 'CAKEUSDT', name: 'CAKE', price: 3.2, priceChange: 1.8 },
+                { symbol: 'UNIUSDT', name: 'UNI', price: 14.5, priceChange: 2.3 },
+                { symbol: 'ATOMUSDT', name: 'ATOM', price: 8.9, priceChange: 0.5 }
+            ];
+            
+            state.cryptoList = defaultCryptos.map(c => ({
+                ...c,
+                volume: 1000000,
+                realTradingAvailable: !!TOKEN_ADDRESSES[c.symbol]
+            }));
+            
+            document.getElementById('cryptoSelect').innerHTML = state.cryptoList.map(c => {
+                const priceDisplay = c.price >= 1000 ? 
+                    (c.price / 1000).toFixed(1) + 'K' : 
+                    c.price.toFixed(c.price < 1 ? 4 : 2);
+                return `<option value="${c.symbol}">${c.name} • $${priceDisplay} 💎</option>`;
+            }).join('');
+            
+            if (state.cryptoList.length > 0) {
+                state.selectedCrypto = state.cryptoList[0].symbol;
+                connectWebSocket();
+            }
+            
+            document.getElementById('cryptoCount').textContent = `(${state.cryptoList.length})`;
+            document.getElementById('refreshText').textContent = 'Actualiser';
+            document.getElementById('apiStatus').innerHTML = '🟢 Prêt';
+            
+            console.log('✅ Cryptos liquides chargées:');
+            console.log(`   • ${state.cryptoList.length} paires haute liquidité`);
+            console.log(`   • 100% trading réel BSC disponible 💎`);
+            console.log(`   • Pas de taxe de transfert`);
+            console.log(`   • Volume élevé sur PancakeSwap`);
+        }
+
+        function changeCrypto() {
+            state.selectedCrypto = document.getElementById('cryptoSelect').value;
+            state.priceHistory = [];
+            wsConnectionAttempts = 0;
+            
+            if (priceSimulationInterval) {
+                clearInterval(priceSimulationInterval);
+                priceSimulationInterval = null;
+            }
+            
+            document.getElementById('chartCrypto').textContent = state.selectedCrypto.replace('USDT', '');
+            
+            const crypto = state.cryptoList.find(c => c.symbol === state.selectedCrypto);
+            if (crypto) {
+                state.currentPrice = crypto.price;
+            }
+            
+            connectWebSocket();
+        }
+
+        function changeTradingMode() {
+            state.tradingMode = document.getElementById('tradingMode').value;
+            
+            if (state.tradingMode === 'real') {
+                const confirm = window.confirm(
+                    '🌊 MODE RÉEL OPENOCEAN ACTIVÉ\n\n' +
+                    '✅ Avantages OpenOcean:\n' +
+                    '   • Meilleur prix agrégé sur tous les DEX\n' +
+                    '   • Routes multi-DEX optimisées\n' +
+                    '   • Slippage minimisé\n' +
+                    '   • SANS COMMISSION bot (uniquement gas BSC)\n\n' +
+                    '⚠️ Risques:\n' +
+                    '   • Perte totale possible\n' +
+                    '   • Frais gas BSC (~0.003-0.01 BNB)\n' +
+                    '   • Minimum 0.02 BNB requis\n\n' +
+                    'Confirmez-vous ?'
+                );
+                
+                if (!confirm) {
+                    document.getElementById('tradingMode').value = 'simulation';
+                    state.tradingMode = 'simulation';
+                }
+            }
+            
+            updateUI();
+        }
+
+        function connectWebSocket() {
+            if (ws) {
+                try {
+                    ws.close();
+                } catch (e) {}
+            }
+            
+            if (wsConnectionAttempts >= MAX_WS_ATTEMPTS) {
+                console.log('🎮 Mode simulation de prix activé');
+                startPriceSimulation();
+                return;
+            }
+            
+            const symbol = state.selectedCrypto.toLowerCase();
+            
+            try {
+                ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@ticker`);
+                
+                ws.onopen = () => {
+                    document.getElementById('apiStatus').innerHTML = '🟢 Prix temps réel';
+                    console.log('✅ WebSocket connecté:', state.selectedCrypto);
+                    wsConnectionAttempts = 0;
+                    
+                    if (priceSimulationInterval) {
+                        clearInterval(priceSimulationInterval);
+                        priceSimulationInterval = null;
+                    }
+                };
+                
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    state.currentPrice = parseFloat(data.c);
+                    
+                    state.priceHistory.push(state.currentPrice);
+                    if (state.priceHistory.length > 100) state.priceHistory.shift();
+                    
+                    if (state.priceHistory.length % 10 === 0) {
+                        updateIndicators();
+                        updateChart();
+                    }
+                    
+                    document.getElementById('currentPrice').textContent = state.currentPrice.toFixed(2);
+                    document.getElementById('cryptoName').textContent = state.selectedCrypto.replace('USDT', '');
+                };
+                
+                ws.onerror = (error) => {
+                    wsConnectionAttempts++;
+                    
+                    if (wsConnectionAttempts >= MAX_WS_ATTEMPTS) {
+                        console.log('🎮 Passage en mode simulation de prix');
+                        startPriceSimulation();
+                    }
+                };
+                
+                ws.onclose = () => {
+                    if (wsConnectionAttempts < MAX_WS_ATTEMPTS) {
+                        wsConnectionAttempts++;
+                        setTimeout(() => {
+                            if (state.selectedCrypto) {
+                                connectWebSocket();
+                            }
+                        }, 2000);
+                    } else {
+                        startPriceSimulation();
+                    }
+                };
+                
+            } catch (error) {
+                console.log('🎮 Mode simulation de prix activé');
+                startPriceSimulation();
+            }
+        }
+        
+        function startPriceSimulation() {
+            if (priceSimulationInterval) {
+                clearInterval(priceSimulationInterval);
+            }
+            
+            document.getElementById('apiStatus').innerHTML = '🟢 Simulation fluide';
+            
+            const crypto = state.cryptoList.find(c => c.symbol === state.selectedCrypto);
+            if (crypto && !state.currentPrice) {
+                state.currentPrice = crypto.price;
+            }
+            
+            if (!state.currentPrice) {
+                state.currentPrice = 1000;
+            }
+            
+            console.log('');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('🎮 MODE SIMULATION FLUIDE ACTIVÉ');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('');
+            console.log(`📊 ${state.selectedCrypto.replace('USDT', '')}/USDT`);
+            console.log(`💰 Prix initial: $${state.currentPrice.toFixed(6)}`);
+            console.log('📈 Mise à jour: 500ms (ultra-fluide)');
+            console.log('📊 Variations: ±0.03% par tick');
+            console.log('✅ Graphique temps réel optimisé !');
+            console.log('');
+            
+            let tickCounter = 0;
+            
+            priceSimulationInterval = setInterval(() => {
+                const variation = (Math.random() - 0.5) * 0.0006;
+                state.currentPrice = state.currentPrice * (1 + variation);
+                
+                state.priceHistory.push(state.currentPrice);
+                if (state.priceHistory.length > 100) state.priceHistory.shift();
+                
+                const decimals = state.currentPrice < 1 ? 6 : state.currentPrice < 100 ? 4 : 2;
+                document.getElementById('currentPrice').textContent = state.currentPrice.toFixed(decimals);
+                document.getElementById('cryptoName').textContent = state.selectedCrypto.replace('USDT', '');
+                
+                tickCounter++;
+                
+                if (tickCounter % 5 === 0) {
+                    updateChart();
+                }
+                
+                if (tickCounter % 20 === 0) {
+                    updateIndicators();
+                }
+            }, 500);
+        }
+
+        function updateIndicators() {
+            if (state.priceHistory.length < 50) return;
+            
+            state.indicators.rsi = calculateRSI(state.priceHistory);
+            state.indicators.macd = calculateMACD(state.priceHistory);
+        }
+
+        function calculateRSI(prices, period = 14) {
+            if (prices.length < period + 1) return 50;
+            
+            let gains = 0, losses = 0;
+            for (let i = prices.length - period; i < prices.length; i++) {
+                const change = prices[i] - prices[i - 1];
+                if (change > 0) gains += change;
+                else losses += Math.abs(change);
+            }
+            
+            const avgGain = gains / period;
+            const avgLoss = losses / period;
+            if (avgLoss === 0) return 100;
+            
+            const rs = avgGain / avgLoss;
+            return 100 - (100 / (1 + rs));
+        }
+
+        function calculateMACD(prices) {
+            if (prices.length < 26) return { histogram: 0 };
+            
+            const ema12 = prices.slice(-12).reduce((a, b) => a + b) / 12;
+            const ema26 = prices.slice(-26).reduce((a, b) => a + b) / 26;
+            
+            return { histogram: ema12 - ema26 };
+        }
+
+        function setCapital() {
+            const capital = parseFloat(document.getElementById('capitalInput').value);
+            
+            if (!capital || capital <= 0) {
+                alert('❌ Montant invalide');
+                return;
+            }
+            
+            if (state.tradingMode === 'real' && capital > parseFloat(state.balanceUSDT)) {
+                alert('❌ Capital supérieur au solde USDT disponible');
+                return;
+            }
+            
+            if (state.tradingMode === 'real' && capital > 100) {
+                const confirm = window.confirm(
+                    `⚠️ ATTENTION\n\nVous allez trader ${capital} USDT en mode RÉEL.\n\n` +
+                    'Il est fortement recommandé de commencer avec 10-50 USDT.\n\n' +
+                    'Continuer ?'
+                );
+                
+                if (!confirm) return;
+            }
+            
+            const privateKeyValue = document.getElementById('privateKeyInput').value.trim();
+            if (privateKeyValue) {
+                try {
+                    const wallet = new ethers.Wallet(privateKeyValue);
+                    const bscProvider = new ethers.providers.JsonRpcProvider(BSC_RPC);
+                    state.wallet = wallet.connect(bscProvider);
+                    state.privateKey = privateKeyValue;
+                    state.autoMode = true;
+                    
+                    console.log('🔐 Mode automatique activé');
+                    console.log('📍 Adresse:', wallet.address);
+                    
+                    alert(`✅ Trading automatique 24/7 activé\n\n` +
+                          `Wallet: ${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}\n` +
+                          `Le bot tradra sans confirmation MetaMask`);
+                } catch (error) {
+                    alert('❌ Clé privée invalide: ' + error.message);
+                    return;
+                }
+            } else {
+                state.autoMode = false;
+                console.log('📱 Mode manuel MetaMask activé');
+            }
+            
+            state.tradingCapital = capital;
+            state.capitalSet = true;
+            
+            updateUI();
+            alert(`✅ Capital défini: ${capital} USDT`);
+        }
+
+        function setMaxCapital() {
+            const balance = parseFloat(state.balanceUSDT);
+            if (balance > 0) {
+                document.getElementById('capitalInput').value = Math.floor(balance * 100) / 100;
+                console.log('💯 Capital défini à 100%:', balance, 'USDT');
+            } else {
+                alert('⚠️ Aucun solde USDT disponible');
+            }
+        }
+
+        function setHalfCapital() {
+            const balance = parseFloat(state.balanceUSDT);
+            if (balance > 0) {
+                document.getElementById('capitalInput').value = Math.floor(balance * 50) / 100;
+                console.log('➗ Capital défini à 50%:', balance / 2, 'USDT');
+            } else {
+                alert('⚠️ Aucun solde USDT disponible');
+            }
+        }
+
+        async function syncWalletBalance() {
+            if (!state.isConnected && !state.wallet) {
+                alert('❌ Connectez d\'abord votre wallet');
+                return;
+            }
+
+            try {
+                const address = state.wallet ? state.wallet.address : state.account;
+                const provider = state.wallet ? state.wallet.provider : state.provider;
+                
+                console.log('🔄 Synchronisation du solde...');
+                
+                const bnbBalance = await provider.getBalance(address);
+                state.balanceBNB = ethers.utils.formatEther(bnbBalance);
+                
+                const usdtBalance = await getTokenBalance(USDT_CONTRACT, address);
+                state.balanceUSDT = ethers.utils.formatUnits(usdtBalance, 18);
+                
+                console.log('✅ Soldes mis à jour:');
+                console.log('💰 BNB:', state.balanceBNB);
+                console.log('💵 USDT:', state.balanceUSDT);
+                
+                document.getElementById('availableBalance').textContent = parseFloat(state.balanceUSDT).toFixed(2);
+                document.getElementById('bnbBalance').textContent = parseFloat(state.balanceBNB).toFixed(4);
+                document.getElementById('usdtBalance').textContent = parseFloat(state.balanceUSDT).toFixed(2);
+                
+                alert(`✅ Soldes actualisés\n\nBNB: ${parseFloat(state.balanceBNB).toFixed(4)}\nUSDT: ${parseFloat(state.balanceUSDT).toFixed(2)}`);
+            } catch (error) {
+                console.error('❌ Erreur synchronisation:', error);
+                alert('❌ Erreur lors de la synchronisation: ' + error.message);
+            }
+        }
+
+        function updateTradeAmount() {
+            if (!state.capitalSet) return;
+            
+            const percent = parseFloat(document.getElementById('tradePercent').value);
+            const amount = (state.tradingCapital * percent / 100).toFixed(2);
+            document.getElementById('tradeAmount').textContent = amount;
+        }
+
+        function toggleBot() {
+            if (!state.subscription.isActive) {
+                alert('❌ Abonnement requis\n\nVeuillez souscrire à un forfait pour utiliser le bot.');
+                document.getElementById('subscriptionSection').classList.remove('hidden');
+                return;
+            }
+            
+            if (!state.isConnected && !state.wallet) {
+                alert('❌ Connectez votre wallet ou entrez une clé privée');
+                return;
+            }
+            
+            if (!state.capitalSet) {
+                alert('❌ Définissez le capital');
+                return;
+            }
+            
+            state.botRunning = !state.botRunning;
+            
+            if (state.botRunning) {
+                startBot();
+                const mode = state.tradingMode === 'real' ? 'RÉEL ⚠️' : 'SIMULATION';
+                const type = state.autoMode ? 'Automatique 24/7' : 'Manuel';
+                alert(`✅ Bot démarré\n\nMode: ${mode}\nType: ${type}`);
+            } else {
+                stopBot();
+            }
+            
+            updateUI();
+        }
+
+        function startBot() {
+            const strategy = strategies[state.selectedStrategy];
+            
+            const intervalDisplay = strategy.minTradeInterval >= 60000 
+                ? `${strategy.minTradeInterval / 60000} min` 
+                : `${strategy.minTradeInterval / 1000}s`;
+            
+            console.log(`\n🚀 BOT DE TRADING DÉMARRÉ`);
+            console.log(`⏰ ${new Date().toLocaleString('fr-FR')}`);
+            console.log(`💰 Capital: ${state.tradingCapital.toFixed(2)} USDT`);
+            console.log(`📊 Stratégie: ${strategy.name}`);
+            console.log(`💎 Mode: ${state.tradingMode === 'real' ? 'RÉEL' : 'SIMULATION'}`);
+            console.log(`🤖 Type: ${state.autoMode ? 'Automatique' : 'Manuel'}`);
+            console.log(`⏱️ Cooldown: ${intervalDisplay} entre chaque trade\n`);
+            
+            let logCounter = 0;
+            
+            botInterval = setInterval(() => {
+                if (state.priceHistory.length < 50) {
+                    console.log(`⏳ Collecte des données... ${state.priceHistory.length}/50 prix`);
+                    return;
+                }
+                
+                const now = Date.now();
+                const timeRemaining = strategy.minTradeInterval - (now - lastTradeTime);
+                
+                if (timeRemaining > 0) {
+                    const timeDisplay = timeRemaining >= 60000 
+                        ? `${Math.ceil(timeRemaining / 60000)} min` 
+                        : `${Math.ceil(timeRemaining / 1000)}s`;
+                    
+                    if (logCounter % 10 === 0) {
+                        console.log(`⏰ Cooldown: ${timeDisplay} | Prix: ${state.currentPrice.toFixed(6)} | RSI: ${state.indicators.rsi.toFixed(1)} | Position: ${state.currentPosition ? '🟢 LONG' : '⚪ AUCUNE'}`);
+                    }
+                    logCounter++;
+                    return;
+                }
+                
+                const signal = getTradeSignal();
+                if (signal.signal && signal.confidence > 0.65) {
+                    console.log(`\n🎯 SIGNAL DÉTECTÉ: ${signal.signal} (Confiance: ${(signal.confidence * 100).toFixed(1)}%)`);
+                    executeTrade(signal.signal, signal.confidence);
+                    logCounter = 0;
+                } else {
+                    if (logCounter % 10 === 0 && !signal.signal) {
+                        console.log(`⏳ Recherche signal... Prix: ${state.currentPrice.toFixed(6)} | RSI: ${state.indicators.rsi.toFixed(1)}`);
+                    }
+                    logCounter++;
+                }
+            }, 5000);
+        }
+
+        function stopBot() {
+            if (botInterval) {
+                clearInterval(botInterval);
+                botInterval = null;
+                
+                console.log(`\n🛑 BOT DE TRADING ARRÊTÉ`);
+                console.log(`⏰ ${new Date().toLocaleString('fr-FR')}`);
+                console.log(`📊 Trades effectués: ${state.trades.length}`);
+                console.log(`💰 Profit total: ${state.portfolio.profit >= 0 ? '+' : ''}${state.portfolio.profit.toFixed(2)} USDT`);
+                console.log(`📈 Performance: ${state.portfolio.profitPercent}%\n`);
+            }
+        }
+
+        function getTradeSignal() {
+            const { rsi, macd } = state.indicators;
+            const strategy = strategies[state.selectedStrategy];
+            
+            if (!state.currentPosition) {
+                const timeSinceLastSell = Date.now() - state.lastSellTime;
+                if (state.lastSellTime > 0 && timeSinceLastSell < POST_SELL_COOLDOWN) {
+                    const cooldownRemaining = Math.ceil((POST_SELL_COOLDOWN - timeSinceLastSell) / 1000);
+                    if (Math.random() < 0.1) {
+                        console.log(`⏸️ Cooldown post-vente: ${cooldownRemaining}s restantes`);
+                    }
+                    return { signal: null, confidence: 0 };
+                }
+                
+                if (rsi < strategy.rsiBuyThreshold && macd.histogram > 0) {
+                    return { signal: 'BUY', confidence: 0.85 };
+                }
+                if (rsi < strategy.rsiBuyStrong) {
+                    return { signal: 'BUY', confidence: 0.9 };
+                }
+                
+                return { signal: null, confidence: 0 };
+            } 
+            else {
+                const profitPercent = ((state.currentPrice - state.lastBuyPrice) / state.lastBuyPrice) * 100;
+                
+                if (profitPercent <= strategy.stopLoss) {
+                    return { signal: 'SELL', confidence: 0.9 };
+                }
+                
+                if (profitPercent >= strategy.takeProfit) {
+                    return { signal: 'SELL', confidence: 0.95 };
+                }
+                
+                return { signal: null, confidence: 0 };
+            }
+        }
+
+        async function executeTrade(tradeType, confidence) {
+            const percent = parseFloat(document.getElementById('tradePercent').value);
+            const tradeAmountUSDT = (state.tradingCapital * percent) / 100;
+            
+            console.log(`\n📊 ${tradeType === 'BUY' ? '🟢 ORDRE D\'ACHAT' : '🔴 ORDRE DE VENTE'}`);
+            console.log(`💰 Montant: ${tradeAmountUSDT.toFixed(2)} USDT`);
+            console.log(`💵 Prix: ${state.currentPrice.toFixed(6)}`);
+            console.log(`💎 Mode: ${state.tradingMode === 'real' ? 'RÉEL' : 'SIMULATION'}`);
+            
+            let txHash = null;
+            let executionPrice = state.currentPrice;
+            
+            if (state.tradingMode === 'real' && (state.isConnected || state.wallet)) {
+                try {
+                    console.log(`🔄 Envoi transaction BSC...`);
+                    
+                    // Vérification du solde BNB avant trade
+                    const address = state.wallet ? state.wallet.address : state.account;
+                    const provider = state.wallet ? state.wallet.provider : state.provider;
+                    const bnbBalance = await provider.getBalance(address);
+                    const minBNB = ethers.utils.parseEther('0.02'); // 0.02 BNB minimum pour gas
+                    
+                    if (bnbBalance.lt(minBNB)) {
+                        throw new Error(`Solde BNB insuffisant. Minimum requis: 0.02 BNB pour gas. Votre solde: ${ethers.utils.formatEther(bnbBalance)} BNB`);
+                    }
+                    
+                    // EXÉCUTION DU TRADE RÉEL
+                    txHash = await executeRealTrade(tradeType, tradeAmountUSDT);
+                    
+                    console.log(`✅ Transaction réelle exécutée: ${txHash}`);
+                    console.log(`🔗 Voir sur BSCScan: https://bscscan.com/tx/${txHash}`);
+                    
+                    // Prix d'exécution réel (on garde le prix actuel comme approximation)
+                    executionPrice = state.currentPrice;
+                    
+                } catch (error) {
+                    console.error(`❌ Erreur transaction:`, error);
+                    
+                    // Message d'erreur détaillé
+                    let errorMsg = '❌ Erreur lors de l\'exécution du trade:\n\n';
+                    
+                    if (error.message.includes('insufficient funds')) {
+                        errorMsg += 'Fonds insuffisants.\nVérifiez vos soldes BNB et USDT.';
+                    } else if (error.message.includes('user rejected')) {
+                        errorMsg += 'Transaction annulée par l\'utilisateur.';
+                    } else if (error.message.includes('BNB insuffisant')) {
+                        errorMsg += error.message + '\n\nVous devez avoir au moins 0.02 BNB pour:\n• Frais gas (~0.003-0.01 BNB)\n• Marge de sécurité';
+                    } else {
+                        errorMsg += error.message;
+                    }
+                    
+                    alert(errorMsg);
+                    return; // Ne pas enregistrer le trade si échec
+                }
+            } else {
+                executionPrice = state.currentPrice * (1 + (Math.random() * 0.01 - 0.005));
+                console.log(`🎮 Mode simulation`);
+            }
+            
+            console.log(`✅ ORDRE EXÉCUTÉ à ${executionPrice.toFixed(6)}`);
+            
+            let profitPercent = 0;
+            let netProfitUSDT = 0;
+            
+            if (tradeType === 'BUY') {
+                if (!state.currentPosition) {
+                    state.currentPosition = 'BUY';
+                    state.lastBuyPrice = executionPrice;
+                    state.positionAmount = tradeAmountUSDT;
+                    console.log(`📈 POSITION OUVERTE`);
+                } else {
+                    const totalAmount = state.positionAmount + tradeAmountUSDT;
+                    state.lastBuyPrice = ((state.lastBuyPrice * state.positionAmount) + (executionPrice * tradeAmountUSDT)) / totalAmount;
+                    state.positionAmount = totalAmount;
+                    console.log(`📈 POSITION AUGMENTÉE`);
+                }
+                
+            } else {
+                if (!state.currentPosition) {
+                    console.error(`❌ ERREUR: Tentative de VENTE sans position`);
+                    return;
+                }
+                
+                profitPercent = ((executionPrice - state.lastBuyPrice) / state.lastBuyPrice) * 100;
+                netProfitUSDT = state.positionAmount * (profitPercent / 100);
+                
+                console.log(`📉 POSITION FERMÉE`);
+                console.log(`${netProfitUSDT >= 0 ? '📈 PROFIT' : '📉 PERTE'}: ${netProfitUSDT >= 0 ? '+' : ''}${netProfitUSDT.toFixed(4)} USDT (${profitPercent >= 0 ? '+' : ''}${profitPercent.toFixed(2)}%)`);
+                
+                state.lastSellTime = Date.now();
+                state.currentPosition = null;
+                state.lastBuyPrice = 0;
+                state.positionAmount = 0;
+            }
+            
+            const newTrade = {
+                id: Date.now(),
+                time: new Date().toLocaleTimeString('fr-FR'),
+                date: new Date().toLocaleDateString('fr-FR'),
+                pair: state.selectedCrypto,
+                type: tradeType,
+                amount: tradeAmountUSDT.toFixed(2),
+                entryPrice: executionPrice.toFixed(6),
+                profit: netProfitUSDT.toFixed(4),
+                profitPercent: profitPercent.toFixed(2),
+                mode: txHash ? 'real' : state.tradingMode,
+                txHash: txHash,
+                strategy: strategies[state.selectedStrategy].name,
+                autoMode: state.autoMode,
+                rsi: state.indicators.rsi.toFixed(1),
+                macd: state.indicators.macd.histogram.toFixed(4)
+            };
+            
+            state.trades.unshift(newTrade);
+            state.trades = state.trades.slice(0, 50);
+            
+            if (tradeType === 'SELL') {
+                state.portfolio.profit += netProfitUSDT;
+                state.portfolio.profitPercent = ((state.portfolio.profit / state.tradingCapital) * 100).toFixed(2);
+            }
+            
+            lastTradeTime = Date.now();
+            
+            renderTrades();
+            updateChart();
+            updateUI();
+            
+            console.log(`💰 Profit cumulé: ${state.portfolio.profit >= 0 ? '+' : ''}${state.portfolio.profit.toFixed(2)} USDT (${state.portfolio.profitPercent}%)\n`);
+        }
+
+        async function executeRealTrade(tradeType, amountUSDT) {
+            const tokenAddress = TOKEN_ADDRESSES[state.selectedCrypto];
+            
+            if (!tokenAddress) {
+                throw new Error('Token non supporté pour trading réel');
+            }
+            
+            let signer, tradingAddress;
+            
+            if (state.wallet) {
+                signer = state.wallet;
+                tradingAddress = state.wallet.address;
+                console.log('🔐 Utilisation wallet automatique');
+            } else if (state.provider) {
+                signer = state.provider.getSigner();
+                tradingAddress = state.account;
+                console.log('📱 Utilisation MetaMask');
+            } else {
+                throw new Error('Aucun signer disponible');
+            }
+            
+            const gasPrice = await signer.provider.getGasPrice();
+            const gasPriceWithBuffer = gasPrice.mul(120).div(100); // +20% pour sécurité
+            
+            console.log('⛽ Gas Price:', ethers.utils.formatUnits(gasPriceWithBuffer, 'gwei'), 'Gwei');
+            
+            const slippage = parseFloat(document.getElementById('slippage').value);
+            
+            console.log('💎 Montant:', amountUSDT, 'USDT');
+            console.log('📍 Adresse:', tradingAddress);
+            console.log('🌊 DEX: OpenOcean (Meilleur prix agrégé)');
+            
+            const bnbBalance = await signer.provider.getBalance(tradingAddress);
+            const minBNBRequired = ethers.utils.parseEther('0.02');
+            
+            if (bnbBalance.lt(minBNBRequired)) {
+                throw new Error(`Solde BNB insuffisant pour les frais. Minimum requis: 0.02 BNB, disponible: ${ethers.utils.formatEther(bnbBalance)} BNB`);
+            }
+            
+            console.log('⛽ Solde BNB:', ethers.utils.formatEther(bnbBalance));
+            
+            if (tradeType === 'BUY') {
+                // ACHAT: USDT → Token via OpenOcean
+                const usdtContract = new ethers.Contract(
+                    USDT_CONTRACT,
+                    [
+                        'function allowance(address owner, address spender) view returns (uint256)',
+                        'function approve(address spender, uint256 amount) returns (bool)',
+                        'function balanceOf(address account) view returns (uint256)',
+                        'function decimals() view returns (uint8)'
+                    ],
+                    signer
+                );
+                
+                const usdtDecimals = 18;
+                const amountInWei = ethers.utils.parseEther(amountUSDT.toString());
+                
+                console.log('💰 Montant USDT à échanger:', amountUSDT.toFixed(2), 'USDT');
+                
+                const usdtBalance = await usdtContract.balanceOf(tradingAddress);
+                console.log('💵 Solde USDT:', ethers.utils.formatUnits(usdtBalance, usdtDecimals));
+                
+                if (usdtBalance.lt(amountInWei)) {
+                    throw new Error(`Solde USDT insuffisant. Requis: ${amountUSDT}, disponible: ${ethers.utils.formatUnits(usdtBalance, usdtDecimals)}`);
+                }
+                
+                // Vérifier et approuver USDT pour OpenOcean
+                console.log('📝 Vérification allowance USDT...');
+                const allowance = await usdtContract.allowance(tradingAddress, OPENOCEAN_EXCHANGE);
+                
+                if (allowance.lt(amountInWei)) {
+                    console.log('🔓 Approbation USDT pour OpenOcean...');
+                    const approveTx = await usdtContract.approve(
+                        OPENOCEAN_EXCHANGE,
+                        ethers.constants.MaxUint256,
+                        { 
+                            gasLimit: 100000,
+                            gasPrice: gasPriceWithBuffer
+                        }
+                    );
+                    console.log('⏳ TX approve:', approveTx.hash);
+                    await approveTx.wait(1);
+                    console.log('✅ USDT approuvé pour OpenOcean');
+                } else {
+                    console.log('✅ USDT déjà approuvé');
+                }
+                
+                // Obtenir la meilleure route via API OpenOcean
+                console.log('🌊 Recherche meilleur prix sur OpenOcean...');
+                
+                const quoteUrl = `${OPENOCEAN_API}/quote`;
+                const quoteParams = new URLSearchParams({
+                    inTokenAddress: USDT_CONTRACT,
+                    outTokenAddress: tokenAddress,
+                    amount: amountInWei.toString(),
+                    gasPrice: gasPriceWithBuffer.toString(),
+                    slippage: slippage.toString(),
+                    account: tradingAddress
+                });
+                
+                let quoteData;
+                try {
+                    const quoteResponse = await fetch(`${quoteUrl}?${quoteParams}`);
+                    quoteData = await quoteResponse.json();
+                    
+                    if (quoteData.code !== 200) {
+                        throw new Error(quoteData.message || 'Erreur API OpenOcean');
+                    }
+                    
+                    console.log('💱 Route trouvée:', quoteData.data.dexes?.join(', ') || 'Multiple DEX');
+                    console.log('💰 Prix estimé:', ethers.utils.formatUnits(quoteData.data.outAmount, 18));
+                    
+                } catch (error) {
+                    console.error('❌ Erreur API OpenOcean:', error);
+                    throw new Error('Impossible d\'obtenir le prix: ' + error.message);
+                }
+                
+                // Obtenir les données de transaction
+                const swapUrl = `${OPENOCEAN_API}/swap_quote`;
+                const swapParams = new URLSearchParams({
+                    inTokenAddress: USDT_CONTRACT,
+                    outTokenAddress: tokenAddress,
+                    amount: amountInWei.toString(),
+                    gasPrice: gasPriceWithBuffer.toString(),
+                    slippage: slippage.toString(),
+                    account: tradingAddress
+                });
+                
+                let swapData;
+                try {
+                    const swapResponse = await fetch(`${swapUrl}?${swapParams}`);
+                    swapData = await swapResponse.json();
+                    
+                    if (swapData.code !== 200) {
+                        throw new Error(swapData.message || 'Erreur swap OpenOcean');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Erreur swap OpenOcean:', error);
+                    throw new Error('Impossible de préparer le swap: ' + error.message);
+                }
+                
+                // Exécuter le swap
+                console.log('🔄 Exécution swap via OpenOcean...');
+                const swapTx = await signer.sendTransaction({
+                    to: swapData.data.to,
+                    data: swapData.data.data,
+                    value: swapData.data.value || '0',
+                    gasLimit: Math.floor(swapData.data.estimatedGas * 1.3), // +30% marge
+                    gasPrice: gasPriceWithBuffer
+                });
+                
+                console.log('⏳ TX swap:', swapTx.hash);
+                console.log('🔗 BSCScan: https://bscscan.com/tx/' + swapTx.hash);
+                
+                const receipt = await swapTx.wait(1);
+                console.log('✅ Swap confirmé - Block:', receipt.blockNumber);
+                console.log('💰 Achat réussi via OpenOcean');
+                
+                return swapTx.hash;
+                
+            } else {
+                // VENTE: Token → USDT via OpenOcean
+                const tokenContract = new ethers.Contract(
+                    tokenAddress,
+                    [
+                        'function balanceOf(address account) view returns (uint256)',
+                        'function allowance(address owner, address spender) view returns (uint256)',
+                        'function approve(address spender, uint256 amount) returns (bool)',
+                        'function decimals() view returns (uint8)'
+                    ],
+                    signer
+                );
+                
+                let decimals = 18;
+                try {
+                    decimals = await tokenContract.decimals();
+                    console.log('📊 Decimals du token:', decimals);
+                } catch (e) {
+                    console.log('⚠️ Decimals non trouvés, utilisation de 18 par défaut');
+                }
+                
+                console.log('📊 Récupération balance token...');
+                const tokenBalance = await tokenContract.balanceOf(tradingAddress);
+                
+                if (tokenBalance.isZero()) {
+                    throw new Error('❌ Aucun token à vendre. Vous devez d\'abord ACHETER avant de VENDRE.');
+                }
+                
+                console.log('💎 Balance token:', ethers.utils.formatUnits(tokenBalance, decimals));
+                
+                const finalTokenAmount = tokenBalance;
+                console.log('💎 Montant à vendre:', ethers.utils.formatUnits(finalTokenAmount, decimals), 'tokens');
+                
+                // Vérifier et approuver token pour OpenOcean
+                const allowance = await tokenContract.allowance(tradingAddress, OPENOCEAN_EXCHANGE);
+                
+                if (allowance.lt(finalTokenAmount)) {
+                    console.log('🔓 Approbation token pour OpenOcean...');
+                    const approveTx = await tokenContract.approve(
+                        OPENOCEAN_EXCHANGE,
+                        ethers.constants.MaxUint256,
+                        { 
+                            gasLimit: 100000,
+                            gasPrice: gasPriceWithBuffer
+                        }
+                    );
+                    console.log('⏳ TX approve:', approveTx.hash);
+                    await approveTx.wait(1);
+                    console.log('✅ Token approuvé pour OpenOcean');
+                } else {
+                    console.log('✅ Token déjà approuvé');
+                }
+                
+                // Obtenir la meilleure route via API OpenOcean
+                console.log('🌊 Recherche meilleur prix de vente sur OpenOcean...');
+                
+                const quoteUrl = `${OPENOCEAN_API}/quote`;
+                const quoteParams = new URLSearchParams({
+                    inTokenAddress: tokenAddress,
+                    outTokenAddress: USDT_CONTRACT,
+                    amount: finalTokenAmount.toString(),
+                    gasPrice: gasPriceWithBuffer.toString(),
+                    slippage: slippage.toString(),
+                    account: tradingAddress
+                });
+                
+                let quoteData;
+                try {
+                    const quoteResponse = await fetch(`${quoteUrl}?${quoteParams}`);
+                    quoteData = await quoteResponse.json();
+                    
+                    if (quoteData.code !== 200) {
+                        throw new Error(quoteData.message || 'Erreur API OpenOcean');
+                    }
+                    
+                    console.log('💱 Route trouvée:', quoteData.data.dexes?.join(', ') || 'Multiple DEX');
+                    console.log('💵 USDT estimé:', ethers.utils.formatUnits(quoteData.data.outAmount, 18));
+                    
+                } catch (error) {
+                    console.error('❌ Erreur API OpenOcean:', error);
+                    throw new Error('Impossible d\'obtenir le prix: ' + error.message);
+                }
+                
+                // Obtenir les données de transaction
+                const swapUrl = `${OPENOCEAN_API}/swap_quote`;
+                const swapParams = new URLSearchParams({
+                    inTokenAddress: tokenAddress,
+                    outTokenAddress: USDT_CONTRACT,
+                    amount: finalTokenAmount.toString(),
+                    gasPrice: gasPriceWithBuffer.toString(),
+                    slippage: slippage.toString(),
+                    account: tradingAddress
+                });
+                
+                let swapData;
+                try {
+                    const swapResponse = await fetch(`${swapUrl}?${swapParams}`);
+                    swapData = await swapResponse.json();
+                    
+                    if (swapData.code !== 200) {
+                        throw new Error(swapData.message || 'Erreur swap OpenOcean');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Erreur swap OpenOcean:', error);
+                    throw new Error('Impossible de préparer le swap: ' + error.message);
+                }
+                
+                // Exécuter le swap
+                console.log('🔄 Exécution vente via OpenOcean...');
+                const swapTx = await signer.sendTransaction({
+                    to: swapData.data.to,
+                    data: swapData.data.data,
+                    value: swapData.data.value || '0',
+                    gasLimit: Math.floor(swapData.data.estimatedGas * 1.3), // +30% marge
+                    gasPrice: gasPriceWithBuffer
+                });
+                
+                console.log('⏳ TX swap:', swapTx.hash);
+                console.log('🔗 BSCScan: https://bscscan.com/tx/' + swapTx.hash);
+                
+                const receipt = await swapTx.wait(1);
+                console.log('✅ Swap confirmé - Block:', receipt.blockNumber);
+                console.log('💰 Vente réussie via OpenOcean');
+                
+                return swapTx.hash;
+            }
+        }
+
+        async function getTokenBalance(tokenAddress, walletAddress) {
+            if (!state.provider && !state.wallet) return ethers.BigNumber.from(0);
+            
+            try {
+                const provider = state.wallet ? state.wallet.provider : state.provider;
+                const contract = new ethers.Contract(
+                    tokenAddress,
+                    ['function balanceOf(address account) view returns (uint256)'],
+                    provider
+                );
+                
+                return await contract.balanceOf(walletAddress);
+            } catch (error) {
+                console.error('Erreur balance:', error);
+                return ethers.BigNumber.from(0);
+            }
+        }
+
+        function renderTrades() {
+            if (state.trades.length === 0) return;
+            
+            document.getElementById('tradesContainer').innerHTML = state.trades.map(t => `
+                <div class="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg mb-2 border-l-4 ${t.type === 'BUY' ? 'border-green-400' : 'border-red-400'}">
+                    <div class="flex items-center gap-4">
+                        <span class="${t.type === 'BUY' ? 'text-green-400' : 'text-red-400'} text-3xl">
+                            ${t.type === 'BUY' ? '🟢' : '🔴'}
+                        </span>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <p class="font-bold text-lg">${t.type === 'BUY' ? 'ACHAT' : 'VENTE'}</p>
+                                <p class="font-semibold">${t.pair.replace('USDT', '')}/USDT</p>
+                                ${t.mode === 'real' ? '<span class="text-xs bg-blue-400/20 text-blue-400 px-2 py-0.5 rounded font-bold">🌊 OPENOCEAN</span>' : '<span class="text-xs bg-blue-400/20 text-blue-400 px-2 py-0.5 rounded">SIM</span>'}
+                                ${t.autoMode ? '<span class="text-xs bg-purple-400/20 text-purple-400 px-2 py-0.5 rounded">AUTO</span>' : ''}
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">${t.date ? t.date + ' - ' : ''}${t.time} • ${t.strategy} • ${t.amount} USDT</p>
+                            <p class="text-xs text-gray-500">RSI: ${t.rsi || 'N/A'} • MACD: ${t.macd || 'N/A'}</p>
+                            ${t.txHash ? `<a href="https://bscscan.com/tx/${t.txHash}" target="_blank" class="text-xs text-purple-400 hover:underline mt-1 inline-block">📋 Voir TX sur BSCScan ↗</a>` : ''}
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-mono">${t.entryPrice}</p>
+                        ${t.type === 'SELL' ? `
+                            <p class="text-lg font-bold ${parseFloat(t.profit) >= 0 ? 'text-green-400' : 'text-red-400'}">
+                                ${parseFloat(t.profit) >= 0 ? '+' : ''}${t.profit} USDT
+                            </p>
+                            <p class="text-sm font-semibold ${parseFloat(t.profitPercent) >= 0 ? 'text-green-400' : 'text-red-400'}">
+                                ${parseFloat(t.profitPercent) >= 0 ? '+' : ''}${t.profitPercent}%
+                            </p>
+                        ` : '<p class="text-sm text-gray-400">Position ouverte</p>'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateUI() {
+            if (state.isConnected) {
+                document.getElementById('connectBtn').className = 'flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all bg-green-600 hover:bg-green-700';
+                document.getElementById('walletText').textContent = `${state.account.slice(0, 6)}...${state.account.slice(-4)}`;
+                document.getElementById('walletStatus').innerHTML = '🟢 Connecté';
+                
+                document.getElementById('cryptoSelector').classList.remove('hidden');
+                document.getElementById('privateKeySection').classList.remove('hidden');
+                document.getElementById('capitalSection').classList.remove('hidden');
+                
+                document.getElementById('bnbBalance').textContent = parseFloat(state.balanceBNB).toFixed(4);
+                document.getElementById('usdtBalance').textContent = parseFloat(state.balanceUSDT).toFixed(2);
+                document.getElementById('availableBalance').textContent = parseFloat(state.balanceUSDT).toFixed(2);
+            }
+            
+            if (state.capitalSet) {
+                document.getElementById('capitalSection').classList.add('hidden');
+                document.getElementById('statsCards').classList.remove('hidden');
+                
+                document.getElementById('capitalDisplay').textContent = state.tradingCapital.toFixed(2);
+                
+                updateTradeAmount();
+                
+                document.getElementById('toggleBotBtn').disabled = false;
+                document.getElementById('toggleBotBtn').className = state.botRunning ? 
+                    'flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-all bg-red-600 hover:bg-red-700' :
+                    'flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-all bg-green-600 hover:bg-green-700';
+            }
+            
+            if (state.tradingMode === 'real') {
+                document.getElementById('modeInfo').textContent = '🌊 Trades réels via OpenOcean (meilleur prix)';
+                document.getElementById('modeDisplay').innerHTML = '🌊 OPENOCEAN';
+                document.getElementById('modeDisplay').className = 'text-xl font-bold mt-1 text-blue-400';
+            } else {
+                document.getElementById('modeInfo').textContent = '✅ Aucun risque financier';
+                document.getElementById('modeDisplay').innerHTML = '🎮 SIM';
+                document.getElementById('modeDisplay').className = 'text-xl font-bold mt-1 text-blue-400';
+            }
+            
+            if (state.botRunning) {
+                document.getElementById('botIcon').textContent = '⏸️';
+                document.getElementById('botText').textContent = 'Arrêter';
+            } else {
+                document.getElementById('botIcon').textContent = '▶️';
+                document.getElementById('botText').textContent = 'Démarrer';
+            }
+            
+            if (state.autoMode) {
+                document.getElementById('tradingTypeStatus').innerHTML = '🤖 Automatique 24/7';
+            } else if (state.isConnected) {
+                document.getElementById('tradingTypeStatus').innerHTML = '📱 Manuel MetaMask';
+            } else {
+                document.getElementById('tradingTypeStatus').innerHTML = '🟡 Non configuré';
+            }
+            
+            if (state.currentPosition) {
+                const profitPercent = ((state.currentPrice - state.lastBuyPrice) / state.lastBuyPrice) * 100;
+                document.getElementById('positionStatus').innerHTML = `🟢 Long ${profitPercent >= 0 ? '+' : ''}${profitPercent.toFixed(2)}%`;
+                document.getElementById('positionStatus').className = profitPercent >= 0 ? 'text-green-400 font-bold' : 'text-red-400 font-bold';
+            } else {
+                document.getElementById('positionStatus').innerHTML = '⚪ Aucune';
+                document.getElementById('positionStatus').className = 'text-gray-400';
+            }
+            
+            document.getElementById('profitDisplay').textContent = state.portfolio.profit.toFixed(2);
+        }
+    </script>
+</body>
+</html>
